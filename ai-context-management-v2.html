@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Context Management for Engineering Teams</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #0a0e17;
+    --bg-card: #111827;
+    --bg-card-hover: #1a2332;
+    --accent-cyan: #22d3ee;
+    --accent-amber: #f59e0b;
+    --accent-violet: #a78bfa;
+    --accent-emerald: #34d399;
+    --accent-rose: #fb7185;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --accent-sky: #38bdf8;
+    --accent-indigo: #818cf8;
+    --accent-pink: #f472b6;
+    --accent-orange: #fb923c;
+    --accent-lime: #a3e635;
+    --accent-teal: #2dd4bf;
+    --accent-red: #f87171;
+    --accent-yellow: #facc15;
+    --accent-fuchsia: #e879f9;
+    --accent-blue: #60a5fa;
+    --text-muted: #64748b;
+    --border: #1e293b;
+    --glow-cyan: rgba(34, 211, 238, 0.15);
+    --glow-amber: rgba(245, 158, 11, 0.15);
+    --glow-violet: rgba(167, 139, 250, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+      radial-gradient(ellipse 600px 400px at 30% 40%, rgba(34, 211, 238, 0.06), transparent),
+      radial-gradient(ellipse 500px 500px at 70% 60%, rgba(167, 139, 250, 0.05), transparent),
+      radial-gradient(ellipse 400px 300px at 50% 80%, rgba(245, 158, 11, 0.04), transparent);
+    animation: drift 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes drift {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(-30px, 20px) rotate(2deg); }
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black, transparent);
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    padding: 0.4rem 1.2rem;
+    border-radius: 100px;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    max-width: 900px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 .highlight {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 640px;
+    position: relative;
+    z-index: 1;
+    font-weight: 300;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    animation: pulse-down 2s ease-in-out infinite;
+  }
+
+  .scroll-hint .arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: rotate(45deg);
+  }
+
+  @keyframes pulse-down {
+    0%, 100% { opacity: 0.4; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(6px); }
+  }
+
+  /* ── Sections ── */
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  .section {
+    margin-bottom: 8rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent-cyan);
+    background: rgba(34, 211, 238, 0.1);
+    border: 1px solid rgba(34, 211, 238, 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Thesis Block ── */
+  .thesis {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), rgba(167, 139, 250, 0.06));
+    border: 1px solid rgba(34, 211, 238, 0.15);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 4rem;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    position: relative;
+  }
+
+  .thesis::before {
+    content: '"';
+    font-size: 6rem;
+    font-weight: 800;
+    color: rgba(34, 211, 238, 0.15);
+    position: absolute;
+    top: -0.5rem;
+    left: 1.5rem;
+    line-height: 1;
+  }
+
+  .thesis strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* ── Visual: The Context Problem ── */
+  .context-visual {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+    margin: 3rem 0;
+  }
+
+  .context-box {
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .context-box.bad {
+    background: rgba(251, 113, 133, 0.06);
+    border: 1px solid rgba(251, 113, 133, 0.2);
+  }
+
+  .context-box.good {
+    background: rgba(52, 211, 153, 0.06);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+  }
+
+  .context-box-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .context-box h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .context-box p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .context-arrow {
+    font-size: 2rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Strategy Cards ── */
+  .strategies {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .strategy-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .strategy-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    border-color: rgba(34, 211, 238, 0.2);
+  }
+
+  .strategy-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .strategy-card[data-color="cyan"]::after { background: var(--accent-cyan); }
+  .strategy-card[data-color="amber"]::after { background: var(--accent-amber); }
+  .strategy-card[data-color="violet"]::after { background: var(--accent-violet); }
+  .strategy-card[data-color="emerald"]::after { background: var(--accent-emerald); }
+  .strategy-card[data-color="rose"]::after { background: var(--accent-rose); }
+    .strategy-card[data-color="red"]::after { background: var(--accent-red); }
+  .strategy-card[data-color="sky"]::after { background: var(--accent-sky); }
+  .strategy-card[data-color="orange"]::after { background: var(--accent-orange); }
+  .strategy-card[data-color="teal"]::after { background: var(--accent-teal); }
+  .strategy-card[data-color="indigo"]::after { background: var(--accent-indigo); }
+  .strategy-card[data-color="pink"]::after { background: var(--accent-pink); }
+  .strategy-card[data-color="blue"]::after { background: var(--accent-blue); }
+  .strategy-card[data-color="fuchsia"]::after { background: var(--accent-fuchsia); }
+
+  .strategy-icon {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .strategy-card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .strategy-card p {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .strategy-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  /* ── Code Blocks ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.8;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .code-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .code-dot.red { background: #ff5f57; }
+  .code-dot.yellow { background: #febc2e; }
+  .code-dot.green { background: #28c840; }
+
+  .code-body {
+    padding: 1.25rem;
+    overflow-x: auto;
+    color: var(--text-secondary);
+  }
+
+  .code-body .dir { color: var(--accent-cyan); }
+  .code-body .file { color: var(--text-secondary); }
+  .code-body .comment { color: var(--accent-emerald); font-style: italic; }
+  .code-body .highlight-line { color: var(--accent-amber); }
+
+  /* ── Contract Flow Diagram ── */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 3rem 0;
+    flex-wrap: wrap;
+  }
+
+  .flow-node {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.75rem;
+    text-align: center;
+    min-width: 160px;
+    position: relative;
+  }
+
+  .flow-node.contract-node {
+    border-color: rgba(34, 211, 238, 0.4);
+    background: rgba(34, 211, 238, 0.06);
+  }
+
+  .flow-node h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .flow-node p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .flow-connector {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    font-size: 1.4rem;
+    padding: 0 0.5rem;
+  }
+
+  /* ── Comparison Table ── */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 2.5rem 0;
+  }
+
+  .comparison-col {
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .comparison-col.monolith {
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+  }
+
+  .comparison-col.greenfield {
+    background: rgba(52, 211, 153, 0.05);
+    border: 1px solid rgba(52, 211, 153, 0.15);
+  }
+
+  .comparison-col h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .comparison-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .comparison-col li {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .comparison-col li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Pitfalls Table ── */
+  .pitfalls-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .pitfall-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 2fr;
+    gap: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    align-items: start;
+    transition: border-color 0.2s;
+  }
+
+  .pitfall-row:hover {
+    border-color: rgba(251, 113, 133, 0.25);
+  }
+
+  .pitfall-row .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .pitfall-row .pitfall-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .pitfall-row .pitfall-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .pitfall-row .pitfall-fix {
+    font-size: 0.85rem;
+    color: var(--accent-emerald);
+  }
+
+  .pitfalls-header {
+    display: grid;
+    grid-template-columns: 2fr 2fr 2fr;
+    gap: 1rem;
+    padding: 0 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .pitfalls-header span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+  }
+
+  /* ── Key Takeaway ── */
+  .takeaway {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.06), rgba(167, 139, 250, 0.08), rgba(245, 158, 11, 0.06));
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    border-radius: 20px;
+    padding: 3.5rem;
+    text-align: center;
+    margin-top: 4rem;
+  }
+
+  .takeaway h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  .takeaway p {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.8;
+  }
+
+  .takeaway .punchline {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    color: var(--accent-cyan);
+    font-weight: 600;
+  }
+
+  /* ── Playbook Checklist ── */
+  .playbook-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .playbook-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .playbook-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .playbook-card ol {
+    list-style: none;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .playbook-card li {
+    counter-increment: step;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    padding-left: 2.2rem;
+    position: relative;
+  }
+
+  .playbook-card li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    top: 0.1rem;
+  }
+
+  .playbook-card.monolith li::before {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--accent-amber);
+  }
+
+  .playbook-card.greenfield li::before {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--accent-emerald);
+  }
+
+  /* ── Animations ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Hub Spokes Diagram ── */
+  .diagram-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 3rem 0;
+  }
+
+  .diagram-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .diagram-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .diagram-card .diagram-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .diagram-card svg {
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+  }
+
+  .diagram-card.before {
+    border-color: rgba(251, 113, 133, 0.2);
+  }
+
+  .diagram-card.after {
+    border-color: rgba(52, 211, 153, 0.2);
+  }
+
+  /* ── Doc Type Comparison ── */
+  .doc-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .doc-type-card {
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .doc-type-card.priming {
+    background: rgba(34, 211, 238, 0.05);
+    border: 1px solid rgba(34, 211, 238, 0.15);
+  }
+
+  .doc-type-card.feature {
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+  }
+
+  .doc-type-card h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .doc-type-card .doc-cadence {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+
+  .doc-type-card.priming .doc-cadence { color: var(--accent-cyan); }
+  .doc-type-card.feature .doc-cadence { color: var(--accent-amber); }
+
+  .doc-type-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .doc-type-card .doc-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  @media (max-width: 768px) {
+    .diagram-pair { grid-template-columns: 1fr; }
+    .doc-types { grid-template-columns: 1fr; }
+  }
+
+  /* ── Real World Example ── */
+  .real-world-example {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-amber);
+    border-radius: 0 16px 16px 0;
+    padding: 2rem 2.5rem;
+    margin: 2.5rem 0;
+  }
+
+  .real-world-example .example-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent-amber);
+    margin-bottom: 0.75rem;
+  }
+
+  .real-world-example h4 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .real-world-example p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.8;
+  }
+
+  .real-world-example .example-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .real-world-example .example-side {
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .real-world-example .example-side.before-ex {
+    background: rgba(251, 113, 133, 0.05);
+    border: 1px solid rgba(251, 113, 133, 0.15);
+  }
+
+  .real-world-example .example-side.after-ex {
+    background: rgba(52, 211, 153, 0.05);
+    border: 1px solid rgba(52, 211, 153, 0.15);
+  }
+
+  .real-world-example .example-side h5 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .real-world-example .example-side.before-ex h5 { color: var(--accent-rose); }
+  .real-world-example .example-side.after-ex h5 { color: var(--accent-emerald); }
+
+  .real-world-example .example-side p {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .real-world-example .example-side code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent-cyan);
+    background: rgba(34,211,238,0.06);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .real-world-example .example-takeaway {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .real-world-example .example-takeaway strong {
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 768px) {
+    .real-world-example .example-comparison { grid-template-columns: 1fr; }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .context-visual { grid-template-columns: 1fr; }
+    .context-arrow { transform: rotate(90deg); }
+    .comparison { grid-template-columns: 1fr; }
+    .flow-diagram { flex-direction: column; }
+    .flow-connector { transform: rotate(90deg); }
+    .pitfall-row { grid-template-columns: 1fr; }
+    .pitfalls-header { display: none; }
+    .pitfall-row .label { display: block; }
+    .playbook-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (min-width: 769px) {
+    .pitfall-row .label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-label">Engineering Team Training</div>
+  <h1>AI <span class="highlight">Context</span> Management</h1>
+  <p class="hero-sub">How to control what the AI sees — so it can do work that actually ships. A practical guide for our teams using Cursor.</p>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ══════ CONTENT ══════ -->
+<div class="content">
+
+  <!-- ── WHY IT MATTERS ── -->
+  <section class="section fade-in">
+    <div class="thesis">
+      State-of-the-art LLMs now operate with context windows of <strong>200K to 1M tokens</strong> (roughly 300–1,500 pages). Claude Opus 4.6 and Sonnet 4.6 support 1M tokens at GA; Gemini 3.1 Pro matches this. Cursor's window varies by model (typically 200K, up to 1M+ in Max Mode with Gemini). But bigger isn't automatically better — <strong>performance degrades as context grows</strong> due to the "lost in the middle" problem, increased cost, and earlier compaction triggers. AI will reduce the need for code monkeys and short-term <strong>INCREASE the need for distributed system engineers</strong>.
+    </div>
+    <div class="context-visual">
+      <div class="context-box bad">
+        <div class="context-box-icon">🌊</div>
+        <h3>Large systems</h3>
+        <p>Undirected - the LLM sees Thousands of files, varied patterns, build artifacts, legacy modules — the AI drowns in noise</p>
+      </div>
+      <div class="context-arrow">→</div>
+      <div class="context-box good">
+        <div class="context-box-icon">🎯</div>
+        <h3>Focused Context</h3>
+        <p>Relevant contracts, anchor files, current module — the AI produces code that ships. <strong>System design is more important than EVER</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 01: CONTEXT MANAGEMENT ── -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2 class="section-title">Context Management</h2>
+    </div>
+
+    <div class="strategies">
+      <div class="strategy-card" data-color="amber">
+        <div class="strategy-icon">📁</div>
+        <h3>Folder-Level Boundaries</h3>
+        <p>Scope your working sessions to logical boundaries. Open only the folder relevant to your task. <strong>Add contract context.</strong> See anchor files</p>
+        <div class="strategy-examples">
+          <span class="tag">API layer</span>
+          <span class="tag">Specific API endpoints</span>
+          <span class="tag">Specific Api endpoint</span>
+          <span class="tag">Specific file</span>
+        </div>
+      </div>
+
+      <div class="strategy-card" data-color="violet">
+        <div class="strategy-icon">⚡</div>
+        <h3>Commands</h3>
+        <p>Specific context for a specific action — a reusable instruction set we always want to apply when performing a particular task. Define commands for recurring workflows so the AI gets the right constraints and patterns every time without you re-explaining.</p>
+        <div class="strategy-examples">
+          <span class="tag">Cursor custom commands</span>
+          <span class="tag">Reusable prompts</span>
+          <span class="tag">Per-action context</span>
+          <span class="tag">Consistent output</span>
+        </div>
+      </div>
+
+      <div class="strategy-card" data-color="emerald">
+        <div class="strategy-icon">🔌</div>
+        <h3>MCPs as Context</h3>
+        <p>Write an MCP server or a top-level document describing what your service can do — its inputs, outputs, and capabilities. This gives AI agents a way to understand and interact with your service <strong>without loading its internals into context</strong>. For common tools (GitHub, Jira, Slack), pre-built MCPs already exist — just connect them.</p>
+        <div class="strategy-examples">
+          <span class="tag">MCP server</span>
+          <span class="tag">Service description doc</span>
+          <span class="tag">Pre-built connectors</span>
+          <span class="tag">Task-level tools</span>
+        </div>
+      </div>
+
+      <div class="strategy-card" data-color="rose">
+        <div class="strategy-icon">💬</div>
+        <h3>Prompt Engineering</h3>
+        <p>Compensate for missing context with precise prompts. Reference file paths, state constraints explicitly, and point to existing patterns as examples.</p>
+        <div class="strategy-examples">
+          <span class="tag">Specific paths</span>
+          <span class="tag">Pattern refs</span>
+          <span class="tag">Boundary constraints</span>
+        </div>
+      </div>
+
+      <div class="strategy-card" data-color="cyan">
+        <div class="strategy-icon">🚫</div>
+        <h3>Ignore Files</h3>
+        <p>Control what the AI <em>doesn't</em> see. Most AI tools support ignore files that work like <code>.gitignore</code> — exclude build artifacts, vendored deps, legacy modules, and generated code.</p>
+        <div class="strategy-examples">
+          <span class="tag">.cursorignore</span>
+          <span class="tag">.claudeignore</span>
+          <span class="tag">.aiderignore</span>
+          <span class="tag">/dist</span>
+          <span class="tag">/node_modules</span>
+          <span class="tag">*.designer.cs</span>
+        </div>
+      </div>
+
+      <div class="strategy-card" data-color="orange">
+        <div class="strategy-icon">🗜️</div>
+        <h3>Context Compaction</h3>
+        <p>Cursor and Claude Code auto-compact at ~64–75% capacity, summarizing earlier context to free space. When this triggers, fidelity drops — earlier file reads, decisions, and errors lose influence. <strong>Plan for it:</strong> break work into focused sessions, don't let one session sprawl across unrelated tasks.</p>
+        <div class="strategy-examples">
+          <span class="tag">~147K effective ceiling</span>
+          <span class="tag">30–40K tokens reserved for system</span>
+          <span class="tag">Auto-triggers silently</span>
+        </div>
+      </div>
+
+      <div class="strategy-card" data-color="sky">
+        <div class="strategy-icon">🔀</div>
+        <h3>Subagents & Task Decomposition</h3>
+        <p>The most powerful pattern for fighting context limits: spawn child agents with scoped context. Claude Code's Task system and Cursor's subagents each get fresh context windows. Parent dispatches, children execute in isolation, results bubble up.</p>
+        <div class="strategy-examples">
+          <span class="tag">Parent → Child pattern</span>
+          <span class="tag">Scoped context per subtask</span>
+          <span class="tag">Parallel execution</span>
+        </div>
+      </div>
+
+      <div class="strategy-card" data-color="fuchsia">
+        <div class="strategy-icon">💰</div>
+        <h3>Cost Awareness</h3>
+        <p>More context = more tokens = more money and slower responses. A 900K request costs the same per-token but you're burning 4.5x the tokens. Even on flat-rate plans, wasted context means earlier compaction and degraded output quality. <strong>Lean context is fast context.</strong></p>
+        <div class="strategy-examples">
+          <span class="tag">Token cost scales linearly</span>
+          <span class="tag">Latency scales too</span>
+          <span class="tag">Compaction = lost fidelity</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priming vs Feature Document -->
+    <h3 style="font-size:1.3rem; font-weight:600; margin:3rem 0 0.5rem;">Two Kinds of Context Documents</h3>
+    <p style="color:var(--text-secondary); font-size:0.95rem; max-width:800px; margin-bottom:1.5rem;">
+      Not all documentation serves the same purpose. <a href="https://martinfowler.com/articles/reduce-friction-ai/context-anchoring.html" style="color:var(--accent-cyan); text-decoration:none; border-bottom:1px solid rgba(34,211,238,0.3);">Martin Fowler's "Context Anchoring"</a> distinguishes two layers — and most teams only do the first.
+    </p>
+
+    <div class="doc-types">
+      <div class="doc-type-card priming">
+        <h4>📘 Priming Document</h4>
+        <div class="doc-cadence">Stable · Shared · Updates quarterly</div>
+        <p>"Here's how this project works." Tech stack, architecture patterns, naming conventions, code examples. This is what CLAUDE.md already is. Every developer, every session, same document.</p>
+        <div class="doc-examples">
+          <span class="tag">CLAUDE.md</span>
+          <span class="tag">Tech stack</span>
+          <span class="tag">Architecture</span>
+          <span class="tag">Conventions</span>
+        </div>
+      </div>
+
+      <div class="doc-type-card feature">
+        <h4>📒 Feature Document</h4>
+        <div class="doc-cadence">Volatile · Per-feature · AI-maintained</div>
+        <p>A running document where the AI succinctly describes what changes it made and why. After each session, the AI appends a summary of decisions, rejected approaches, and current state. <strong>We will add a Cursor command to auto-write to this file.</strong> This is what keeps context alive between sessions.</p>
+        <div class="doc-examples">
+          <span class="tag">Changes made</span>
+          <span class="tag">Decisions & rationale</span>
+          <span class="tag">Rejected approaches</span>
+          <span class="tag">Cursor command to write</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="thesis" style="margin-top:1.5rem; font-size:1rem; padding:1.5rem 2rem;">
+      <strong>Fowler's litmus test:</strong> If you feel anxious closing a chat session because you'll lose context, your decisions aren't properly anchored outside the conversation. The feature document solves this.
+    </div>
+  </section>
+
+  <!-- ── FILE STRUCTURES ── -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-title">File Structure & Hierarchy</h2>
+    </div>
+
+    <!-- Service Structure Code Block -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-dot red"></span>
+        <span class="code-dot yellow"></span>
+        <span class="code-dot green"></span>
+        <span>Recommended Service Structure</span>
+      </div>
+      <div class="code-body">
+<pre><span class="dir">/my-service</span>
+├── <span class="highlight-line">CLAUDE.md</span>              <span class="comment"># AI instructions for this service</span>
+├── <span class="dir">contracts/</span>
+│   ├── <span class="file">api.yaml</span>           <span class="comment"># OpenAPI spec</span>
+│   └── <span class="file">events.schema.json</span> <span class="comment"># Event schemas</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="dir">handlers/</span>          <span class="comment"># Request handlers</span>
+│   ├── <span class="dir">services/</span>          <span class="comment"># Business logic</span>
+│   ├── <span class="dir">repositories/</span>      <span class="comment"># Data access</span>
+│   └── <span class="dir">models/</span>            <span class="comment"># Domain models</span>
+├── <span class="dir">tests/</span>
+└── <span class="file">Dockerfile</span></pre>
+      </div>
+    </div>
+
+    <!-- CLAUDE.md Hierarchy -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-dot red"></span>
+        <span class="code-dot yellow"></span>
+        <span class="code-dot green"></span>
+        <span>CLAUDE.md Hierarchy — Layered Context</span>
+      </div>
+      <div class="code-body">
+<pre><span class="dir">/repo</span>
+├── <span class="highlight-line">CLAUDE.md</span>              <span class="comment"># Repo-wide rules (always loaded)</span>
+├── <span class="dir">services/</span>
+│   ├── <span class="highlight-line">CLAUDE.md</span>          <span class="comment"># Shared service conventions</span>
+│   ├── <span class="dir">billing/</span>
+│   │   ├── <span class="highlight-line">CLAUDE.md</span>      <span class="comment"># Billing-specific rules</span>
+│   │   └── <span class="dir">src/</span>
+│   └── <span class="dir">auth/</span>
+│       ├── <span class="highlight-line">CLAUDE.md</span>      <span class="comment"># Auth-specific rules</span>
+│       └── <span class="dir">src/</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MCP: GIVING AI EYES ── -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-title">MCP: Giving AI Eyes Into Your System</h2>
+    </div>
+
+    <p style="color:var(--text-secondary); font-size:1rem; max-width:800px; margin-bottom:2rem;">
+      Without MCP, the AI only sees the code in front of it. With MCP, it can reach into surrounding systems for live context and actions.
+    </p>
+
+    <div class="diagram-pair">
+      <div class="diagram-card before">
+        <h4>Without MCP</h4>
+        <div class="diagram-subtitle">AI is blind beyond its context window</div>
+        <svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="105" cy="70" r="45" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+          <text x="105" y="65" text-anchor="middle" fill="#64748b" font-family="Outfit" font-size="11" font-weight="600">Jira</text>
+          <text x="105" y="80" text-anchor="middle" fill="#475569" font-family="Outfit" font-size="9">Issues, sprints</text>
+          <circle cx="315" cy="70" r="45" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+          <text x="315" y="65" text-anchor="middle" fill="#64748b" font-family="Outfit" font-size="11" font-weight="600">Database</text>
+          <text x="315" y="80" text-anchor="middle" fill="#475569" font-family="Outfit" font-size="9">Schemas, data</text>
+          <circle cx="55" cy="210" r="45" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+          <text x="55" y="205" text-anchor="middle" fill="#64748b" font-family="Outfit" font-size="11" font-weight="600">Slack</text>
+          <text x="55" y="220" text-anchor="middle" fill="#475569" font-family="Outfit" font-size="9">Messages</text>
+          <circle cx="365" cy="210" r="45" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+          <text x="365" y="205" text-anchor="middle" fill="#64748b" font-family="Outfit" font-size="11" font-weight="600">GitHub</text>
+          <text x="365" y="220" text-anchor="middle" fill="#475569" font-family="Outfit" font-size="9">PRs, code</text>
+          <circle cx="140" cy="320" r="45" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+          <text x="140" y="315" text-anchor="middle" fill="#64748b" font-family="Outfit" font-size="11" font-weight="600">Internal API</text>
+          <text x="140" y="330" text-anchor="middle" fill="#475569" font-family="Outfit" font-size="9">Your services</text>
+          <circle cx="280" cy="320" r="45" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+          <text x="280" y="315" text-anchor="middle" fill="#64748b" font-family="Outfit" font-size="11" font-weight="600">Docs</text>
+          <text x="280" y="330" text-anchor="middle" fill="#475569" font-family="Outfit" font-size="9">Confluence, etc</text>
+          <line x1="155" y1="95" x2="175" y2="140" stroke="#334155" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+          <line x1="270" y1="95" x2="245" y2="140" stroke="#334155" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+          <line x1="95" y1="190" x2="165" y2="175" stroke="#334155" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+          <line x1="325" y1="190" x2="255" y2="175" stroke="#334155" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+          <line x1="160" y1="280" x2="195" y2="215" stroke="#334155" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+          <line x1="265" y1="280" x2="230" y2="215" stroke="#334155" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+          <circle cx="210" cy="180" r="50" fill="rgba(251,113,133,0.1)" stroke="#fb7185" stroke-width="2"/>
+          <text x="210" y="173" text-anchor="middle" fill="#fb7185" font-family="Outfit" font-size="13" font-weight="700">🤖 AI Agent</text>
+          <text x="210" y="192" text-anchor="middle" fill="#fb7185" font-family="JetBrains Mono" font-size="9">Only sees code</text>
+          <text x="168" y="125" text-anchor="middle" fill="#fb7185" font-family="Outfit" font-size="16" font-weight="800">✗</text>
+          <text x="253" y="125" text-anchor="middle" fill="#fb7185" font-family="Outfit" font-size="16" font-weight="800">✗</text>
+          <text x="138" y="185" text-anchor="middle" fill="#fb7185" font-family="Outfit" font-size="16" font-weight="800">✗</text>
+          <text x="282" y="185" text-anchor="middle" fill="#fb7185" font-family="Outfit" font-size="16" font-weight="800">✗</text>
+          <text x="185" y="250" text-anchor="middle" fill="#fb7185" font-family="Outfit" font-size="16" font-weight="800">✗</text>
+          <text x="240" y="250" text-anchor="middle" fill="#fb7185" font-family="Outfit" font-size="16" font-weight="800">✗</text>
+        </svg>
+      </div>
+
+      <div class="diagram-card after">
+        <h4>With MCP Layer</h4>
+        <div class="diagram-subtitle">AI can reach into surrounding systems</div>
+        <svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="105" cy="70" r="45" fill="rgba(52,211,153,0.06)" stroke="#34d399" stroke-width="1.5"/>
+          <text x="105" y="65" text-anchor="middle" fill="#34d399" font-family="Outfit" font-size="11" font-weight="600">Jira</text>
+          <text x="105" y="80" text-anchor="middle" fill="#6ee7b7" font-family="Outfit" font-size="9">Issues, sprints</text>
+          <circle cx="315" cy="70" r="45" fill="rgba(52,211,153,0.06)" stroke="#34d399" stroke-width="1.5"/>
+          <text x="315" y="65" text-anchor="middle" fill="#34d399" font-family="Outfit" font-size="11" font-weight="600">Database</text>
+          <text x="315" y="80" text-anchor="middle" fill="#6ee7b7" font-family="Outfit" font-size="9">Schemas, data</text>
+          <circle cx="55" cy="210" r="45" fill="rgba(52,211,153,0.06)" stroke="#34d399" stroke-width="1.5"/>
+          <text x="55" y="205" text-anchor="middle" fill="#34d399" font-family="Outfit" font-size="11" font-weight="600">Slack</text>
+          <text x="55" y="220" text-anchor="middle" fill="#6ee7b7" font-family="Outfit" font-size="9">Messages</text>
+          <circle cx="365" cy="210" r="45" fill="rgba(52,211,153,0.06)" stroke="#34d399" stroke-width="1.5"/>
+          <text x="365" y="205" text-anchor="middle" fill="#34d399" font-family="Outfit" font-size="11" font-weight="600">GitHub</text>
+          <text x="365" y="220" text-anchor="middle" fill="#6ee7b7" font-family="Outfit" font-size="9">PRs, code</text>
+          <circle cx="140" cy="320" r="45" fill="rgba(52,211,153,0.06)" stroke="#34d399" stroke-width="1.5"/>
+          <text x="140" y="315" text-anchor="middle" fill="#34d399" font-family="Outfit" font-size="11" font-weight="600">Internal API</text>
+          <text x="140" y="330" text-anchor="middle" fill="#6ee7b7" font-family="Outfit" font-size="9">Your services</text>
+          <circle cx="280" cy="320" r="45" fill="rgba(52,211,153,0.06)" stroke="#34d399" stroke-width="1.5"/>
+          <text x="280" y="315" text-anchor="middle" fill="#34d399" font-family="Outfit" font-size="11" font-weight="600">Docs</text>
+          <text x="280" y="330" text-anchor="middle" fill="#6ee7b7" font-family="Outfit" font-size="9">Confluence, etc</text>
+          <line x1="150" y1="100" x2="175" y2="140" stroke="#34d399" stroke-width="2" opacity="0.7"/>
+          <line x1="275" y1="100" x2="245" y2="140" stroke="#34d399" stroke-width="2" opacity="0.7"/>
+          <line x1="95" y1="190" x2="165" y2="170" stroke="#34d399" stroke-width="2" opacity="0.7"/>
+          <line x1="325" y1="190" x2="255" y2="170" stroke="#34d399" stroke-width="2" opacity="0.7"/>
+          <line x1="165" y1="280" x2="195" y2="220" stroke="#34d399" stroke-width="2" opacity="0.7"/>
+          <line x1="260" y1="280" x2="230" y2="220" stroke="#34d399" stroke-width="2" opacity="0.7"/>
+          <rect x="148" y="112" width="36" height="16" rx="8" fill="#0a0e17" stroke="#34d399" stroke-width="1"/>
+          <text x="166" y="123" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono" font-size="7" font-weight="600">MCP</text>
+          <rect x="242" y="112" width="36" height="16" rx="8" fill="#0a0e17" stroke="#34d399" stroke-width="1"/>
+          <text x="260" y="123" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono" font-size="7" font-weight="600">MCP</text>
+          <rect x="113" y="172" width="36" height="16" rx="8" fill="#0a0e17" stroke="#34d399" stroke-width="1"/>
+          <text x="131" y="183" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono" font-size="7" font-weight="600">MCP</text>
+          <rect x="273" y="172" width="36" height="16" rx="8" fill="#0a0e17" stroke="#34d399" stroke-width="1"/>
+          <text x="291" y="183" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono" font-size="7" font-weight="600">MCP</text>
+          <rect x="170" y="244" width="36" height="16" rx="8" fill="#0a0e17" stroke="#34d399" stroke-width="1"/>
+          <text x="188" y="255" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono" font-size="7" font-weight="600">MCP</text>
+          <rect x="225" y="244" width="36" height="16" rx="8" fill="#0a0e17" stroke="#34d399" stroke-width="1"/>
+          <text x="243" y="255" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono" font-size="7" font-weight="600">MCP</text>
+          <circle cx="210" cy="180" r="52" fill="none" stroke="#34d399" stroke-width="1" opacity="0.2"/>
+          <circle cx="210" cy="180" r="50" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" stroke-width="2"/>
+          <text x="210" y="173" text-anchor="middle" fill="#22d3ee" font-family="Outfit" font-size="13" font-weight="700">🤖 AI Agent</text>
+          <text x="210" y="192" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9">Live context + actions</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Real World Example: Cost in a Monolith -->
+    <div class="real-world-example">
+      <div class="example-label">💡 Real-World Example — Local MCPs in a Monolith</div>
+      <h4>Why "Cost" Should Be an MCP, Not Context</h4>
+      <p>
+        Right now, if an AI agent needs to do anything that touches cost in a large monolith, it has to load a bunch of cost-related files into context, understand the domain model, figure out the relationships, and reason about it from scratch every session. That's expensive context-wise and error-prone in a monolith that big.
+      </p>
+      <p>
+        Imagine instead that cost is exposed as a local MCP server — a thin facade over the existing codebase. The agent doesn't need to understand <em>how cost works internally</em>. It calls task-level tools and gets answers. The cost domain knowledge lives inside the MCP server implementation, not in the AI's context window.
+      </p>
+
+      <div class="example-comparison">
+        <div class="example-side before-ex">
+          <h5>Without MCP: Cost in Context</h5>
+          <p>Agent loads 40+ cost files into context every session</p>
+          <p>Has to re-learn the domain model, relationships, and business rules from scratch</p>
+          <p>Burns context tokens on code it doesn't need to modify — just query</p>
+          <p>Gets it wrong when the module is too large to fit alongside the actual task</p>
+        </div>
+        <div class="example-side after-ex">
+          <h5>With MCP: Cost as a Service</h5>
+          <p>Agent calls <code>get_cost_breakdown(project_id)</code></p>
+          <p>Agent calls <code>get_budget_vs_actual(project_id, period)</code></p>
+          <p>Agent calls <code>get_change_order_impact(change_order_id)</code></p>
+          <p>Zero cost files in context. Domain knowledge lives in the MCP server.</p>
+        </div>
+      </div>
+
+      <div class="example-takeaway">
+        <strong>The key insight:</strong> You don't have to decompose the monolith to get the AI benefits of service boundaries. Build a thin MCP facade over domains the AI consumes frequently — cost, reporting, project status, document management. The monolith stays as-is, but the AI's interface becomes clean task-level tools. Use <strong>MCP for AI-as-user</strong> (querying cost data). Keep <strong>source code in context for AI-as-developer</strong> (changing how cost works).
+      </div>
+    </div>
+  </section>
+
+  <!-- ── KEY TAKEAWAY ── -->
+  <div class="takeaway fade-in">
+    <h2>Key Takeaway</h2>
+    <p class="punchline">
+      The teams that get the most out of AI tooling aren't the ones with the best prompts.<br>
+      They're the ones with the best-organized codebases.
+    </p>
+  </div>
+
+  <div style="text-align:right; padding:2rem 0 0; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:0.8rem;">
+    Author: Chesleigh Denison
+  </div>
+
+</div>
+
+<!-- ══════ SCROLL ANIMATION ══════ -->
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

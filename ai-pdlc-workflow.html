@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-PDLC Weekly Workflow</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #12151c;
+    --surface-raised: #1a1e28;
+    --surface-hover: #222736;
+    --border: #2a2f3e;
+    --border-bright: #3a4158;
+    --text: #e2e4ea;
+    --text-dim: #8b90a0;
+    --text-muted: #5c6070;
+    --accent-product: #f59e0b;
+    --accent-product-dim: rgba(245, 158, 11, 0.12);
+    --accent-product-glow: rgba(245, 158, 11, 0.25);
+    --accent-eng: #3b82f6;
+    --accent-eng-dim: rgba(59, 130, 246, 0.12);
+    --accent-eng-glow: rgba(59, 130, 246, 0.25);
+    --accent-ceremony: #a78bfa;
+    --accent-ceremony-dim: rgba(167, 139, 250, 0.12);
+    --accent-ceremony-glow: rgba(167, 139, 250, 0.25);
+    --accent-handoff: #10b981;
+    --accent-handoff-dim: rgba(16, 185, 129, 0.12);
+    --accent-demo: #f472b6;
+    --accent-demo-dim: rgba(244, 114, 182, 0.12);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* --- HEADER --- */
+  .header {
+    padding: 80px 60px 50px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .header-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-product);
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .header h1 {
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    color: var(--text);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.1s forwards;
+  }
+  .header h1 span {
+    background: linear-gradient(135deg, var(--accent-product), #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-sub {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 680px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.2s forwards;
+  }
+
+  /* --- TWO-TRACK OVERVIEW --- */
+  .tracks-section {
+    padding: 40px 60px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.3s forwards;
+  }
+  .track-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .track-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .track-card.product::before { background: linear-gradient(90deg, var(--accent-product), #fbbf24); }
+  .track-card.engineering::before { background: linear-gradient(90deg, var(--accent-eng), #60a5fa); }
+  .track-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .track-card.product .track-label { color: var(--accent-product); }
+  .track-card.engineering .track-label { color: var(--accent-eng); }
+  .track-card h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+  .track-card p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* --- AGENT PIPELINE --- */
+  .pipeline-section {
+    padding: 60px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent-product);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .section-desc {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-bottom: 40px;
+    max-width: 700px;
+  }
+  .pipeline {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-bottom: 16px;
+  }
+  .phase-group {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+    position: relative;
+    padding: 32px 10px 10px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .phase-group.discovery { border-color: rgba(30, 64, 175, 0.3); background: rgba(30, 64, 175, 0.05); }
+  .phase-group.viability { border-color: rgba(13, 148, 136, 0.3); background: rgba(13, 148, 136, 0.05); }
+  .phase-label {
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    font-family: var(--mono);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .phase-group.discovery .phase-label { color: #60a5fa; }
+  .phase-group.viability .phase-label { color: #5eead4; }
+  .phase-arrow {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 20px;
+    padding: 0 4px;
+    padding-top: 22px;
+  }
+  .pipeline::-webkit-scrollbar { height: 4px; }
+  .pipeline::-webkit-scrollbar-track { background: var(--surface); border-radius: 2px; }
+  .pipeline::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+  .pipe-node {
+    flex: 0 0 auto;
+    width: 138px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    cursor: default;
+  }
+  .pipe-node:hover {
+    border-color: var(--accent-product);
+    background: var(--surface-raised);
+    transform: translateY(-3px);
+  }
+  .pipe-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent-product);
+    background: var(--accent-product-dim);
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .pipe-name {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .pipe-artifact {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 3px 7px;
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+  .pipe-arrow {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 16px;
+    padding: 0 2px;
+  }
+  .pipe-divider {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+  }
+  .pipe-divider-line {
+    width: 2px;
+    height: 60px;
+    background: var(--accent-handoff);
+    border-radius: 1px;
+    position: relative;
+  }
+  .pipe-divider-label {
+    font-family: var(--mono);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--accent-handoff);
+    text-transform: uppercase;
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    white-space: nowrap;
+  }
+
+  /* handoff callout */
+  .handoff-bar {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--accent-handoff-dim);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 10px;
+    padding: 16px 22px;
+  }
+  .handoff-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .handoff-text {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .handoff-text strong { color: var(--accent-handoff); }
+
+  /* --- WEEKLY CADENCE --- */
+  .cadence-section {
+    padding: 60px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .week-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .day-card:hover {
+    transform: translateY(-2px);
+  }
+  .day-card.monday { border-color: var(--accent-ceremony); }
+  .day-card.monday:hover { border-color: var(--accent-ceremony); }
+  .day-card.build { }
+  .day-card.build:hover { border-color: var(--accent-eng); }
+  .day-card.friday-am { border-color: var(--accent-demo); }
+  .day-card.friday-am:hover { border-color: var(--accent-demo); }
+  .day-card.friday-pm { border-color: var(--accent-eng); }
+  .day-card.friday-pm:hover { border-color: var(--accent-eng); }
+
+  .day-header {
+    padding: 18px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .day-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .day-card.monday .day-name { color: var(--accent-ceremony); }
+  .day-card.build .day-name { color: var(--accent-eng); }
+  .day-card.friday-am .day-name { color: var(--accent-demo); }
+  .day-card.friday-pm .day-name { color: var(--accent-eng); }
+
+  .day-duration {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .day-title {
+    padding: 0 20px;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+  }
+  .day-body {
+    padding: 0 20px 20px;
+  }
+  .day-body p {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .day-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .day-items li {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.65;
+    padding: 4px 0;
+    padding-left: 18px;
+    position: relative;
+  }
+  .day-items li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+  }
+  .day-card.monday .day-items li::before { background: var(--accent-ceremony); }
+  .day-card.build .day-items li::before { background: var(--accent-eng); }
+  .day-card.build .day-items.product-items li::before { background: var(--accent-product); }
+  .day-card.friday-pm .day-items.product-items li::before { background: var(--accent-product); }
+  .day-card.friday-am .day-items li::before { background: var(--accent-demo); }
+  .day-card.friday-pm .day-items li::before { background: var(--accent-eng); }
+
+  .day-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-right: 4px;
+  }
+  .tag-ceremony { background: var(--accent-ceremony-dim); color: var(--accent-ceremony); }
+  .tag-eng { background: var(--accent-eng-dim); color: var(--accent-eng); }
+  .tag-demo { background: var(--accent-demo-dim); color: var(--accent-demo); }
+  .tag-discovery { background: rgba(30, 64, 175, 0.2); color: #60a5fa; border: 1px solid rgba(30, 64, 175, 0.35); }
+  .tag-viability { background: rgba(13, 148, 136, 0.2); color: #5eead4; border: 1px solid rgba(13, 148, 136, 0.35); }
+  .tag-build { background: rgba(147, 197, 253, 0.15); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3); }
+
+  /* --- ASYNC PRODUCT TRACK --- */
+  .async-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .async-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-product);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .async-flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .async-step {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--accent-product-dim);
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .async-arrow {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .async-note {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-left: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* --- ROLES --- */
+  .roles-section {
+    padding: 60px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .role-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 30px 26px;
+  }
+  .role-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+  }
+  .role-name {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+  }
+  .role-desc {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* --- TOOLING --- */
+  .tools-section {
+    padding: 40px 60px 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .tools-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .tool-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    transition: border-color 0.2s;
+  }
+  .tool-chip:hover { border-color: var(--border-bright); }
+  .tool-icon { font-size: 20px; }
+  .tool-info {}
+  .tool-name {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .tool-use {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* --- PRINCIPLE --- */
+  .principle-section {
+    padding: 0 60px 100px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .principle-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .principle-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-product), var(--accent-ceremony), var(--accent-eng));
+  }
+  .principle-quote {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 16px;
+    letter-spacing: -0.2px;
+  }
+  .principle-source {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* --- ANIMATIONS --- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width: 1100px) {
+    .week-grid { grid-template-columns: repeat(2, 1fr); }
+    .roles-grid { grid-template-columns: 1fr 1fr !important; }
+  }
+  @media (max-width: 768px) {
+    .header, .tracks-section, .pipeline-section, .cadence-section,
+    .roles-section, .tools-section, .principle-section { padding-left: 24px; padding-right: 24px; }
+    .tracks-grid { grid-template-columns: 1fr; }
+    .week-grid { grid-template-columns: 1fr; }
+    .roles-grid { grid-template-columns: 1fr; }
+    .async-bar { flex-direction: column; align-items: flex-start; }
+    .async-note { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-label">McKinsey AI-PDLC × Weekly Kanban</div>
+  <h1>AI-PDLC <span>Weekly Workflow</span></h1>
+  <p class="header-sub">Product uses AI agents to prepare artifacts. On Monday, product and engineering collaborate to turn them into a plan. Devs build all week. Friday, the whole team demos, reviews, and polishes together. Faster discovery. Faster requirements. Faster builds.</p>
+</header>
+
+<!-- BUILD & TEST CYCLE -->
+<section class="pipeline-section" style="padding-bottom: 20px;">
+  <div class="section-label" style="color: #93c5fd;">Build & Test Cycle</div>
+  <div class="section-title">The engineering loop</div>
+  <p class="section-desc">Adapted from McKinsey's Accelerated AI Product Development Approach. This is the continuous cycle engineering runs within each week.</p>
+  <div style="display: flex; justify-content: center; padding: 20px 0;">
+    <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; width: 100%;">
+      <defs>
+        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#3a4158"/>
+        </marker>
+      </defs>
+
+      <!-- Connecting arcs with arrows -->
+      <path d="M 350,40 A 240,170 0 0,1 565,120" fill="none" stroke="#2a2f3e" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+      <path d="M 575,145 A 240,170 0 0,1 575,280" fill="none" stroke="#2a2f3e" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+      <path d="M 565,305 A 240,170 0 0,1 430,375" fill="none" stroke="#2a2f3e" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+      <path d="M 400,385 A 240,170 0 0,1 260,375" fill="none" stroke="#2a2f3e" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+      <path d="M 235,370 A 240,170 0 0,1 130,290" fill="none" stroke="#2a2f3e" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+      <path d="M 120,265 A 240,170 0 0,1 125,140" fill="none" stroke="#2a2f3e" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+      <path d="M 135,120 A 240,170 0 0,1 320,42" fill="none" stroke="#2a2f3e" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+      <!-- Node 14: Refine product backlog (top center) -->
+      <circle cx="350" cy="38" r="22" fill="rgba(13, 148, 136, 0.2)" stroke="#5eead4" stroke-width="1.5"/>
+      <text x="350" y="35" text-anchor="middle" fill="#5eead4" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">14</text>
+      <text x="350" y="46" text-anchor="middle" fill="#5eead4" font-family="JetBrains Mono, monospace" font-size="6">REFINE</text>
+      <text x="350" y="75" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">Refine product</text>
+      <text x="350" y="87" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">backlog</text>
+
+      <!-- Node 15: Define & refine sprints (top right) -->
+      <circle cx="565" cy="120" r="22" fill="rgba(147, 197, 253, 0.15)" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="565" y="117" text-anchor="middle" fill="#93c5fd" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">15</text>
+      <text x="565" y="128" text-anchor="middle" fill="#93c5fd" font-family="JetBrains Mono, monospace" font-size="6">PLAN</text>
+      <text x="565" y="155" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">Define & refine</text>
+      <text x="565" y="167" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">sprints</text>
+
+      <!-- Node 16: Detailed design specs (right) -->
+      <circle cx="590" cy="210" r="22" fill="rgba(167, 139, 250, 0.15)" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="590" y="207" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">16</text>
+      <text x="590" y="218" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="6">DESIGN</text>
+      <text x="652" y="207" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">Detailed</text>
+      <text x="652" y="219" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">design specs</text>
+
+      <!-- Node 17: Write code & models (bottom right) -->
+      <circle cx="555" cy="305" r="22" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="555" y="302" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">17</text>
+      <text x="555" y="313" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="6">CODE</text>
+      <text x="555" y="340" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">Write code</text>
+      <text x="555" y="352" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">& models</text>
+
+      <!-- Node 18: Unit & integration tests (bottom) -->
+      <circle cx="420" cy="385" r="22" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="420" y="382" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">18</text>
+      <text x="420" y="393" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="6">TEST</text>
+      <text x="420" y="418" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">Unit & integration tests</text>
+
+      <!-- Node 19: E2E tests (bottom left) -->
+      <circle cx="260" cy="385" r="22" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="260" y="382" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">19</text>
+      <text x="260" y="393" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="6">E2E</text>
+      <text x="260" y="418" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">E2E tests</text>
+
+      <!-- Node 20: AI-assisted documentation (left) -->
+      <circle cx="130" cy="290" r="22" fill="rgba(245, 158, 11, 0.15)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="130" y="287" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">20</text>
+      <text x="130" y="298" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono, monospace" font-size="6">DOCS</text>
+      <text x="62" y="287" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">AI-assisted</text>
+      <text x="62" y="299" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">documentation</text>
+
+      <!-- Launch Gate (between 20 and 14, left side) -->
+      <rect x="105" y="128" width="50" height="28" rx="6" fill="rgba(245, 158, 11, 0.2)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="130" y="146" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700">LAUNCH</text>
+      <text x="130" y="113" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">Launch</text>
+      <text x="130" y="125" text-anchor="middle" fill="#8b90a0" font-family="DM Sans, sans-serif" font-size="10">Gate</text>
+
+      <!-- Center label -->
+      <text x="350" y="200" text-anchor="middle" fill="#e2e4ea" font-family="DM Sans, sans-serif" font-size="16" font-weight="600">Build & Test</text>
+      <text x="350" y="222" text-anchor="middle" fill="#5c6070" font-family="JetBrains Mono, monospace" font-size="9">T₂ — continuous cycle</text>
+    </svg>
+  </div>
+</section>
+
+<!-- TWO TRACKS -->
+<section class="tracks-section">
+  <div class="tracks-grid">
+    <div class="track-card product">
+      <div class="track-label">Track 1 — Product</div>
+      <h3>Async, AI-Assisted Discovery</h3>
+      <p>Product owners use a pipeline of AI agents covering user research, market requirements, journey maps, PRDs, and prototypes. Some weeks it's the full flow. Most weeks it's targeted — updating a journey map, refining a PRD, generating mocks for a specific feature. By Friday, the week's specific artifacts are ready for the EM.</p>
+    </div>
+    <div class="track-card engineering">
+      <div class="track-label">Track 2 — Engineering</div>
+      <h3>Continuous Engineering Execution</h3>
+      <p>On Monday, devs work alongside product to deeply understand the users, the problem, and the artifacts. EM has already organized the work into stories on the board. Devs build Tue–Thu, demo Friday morning, and polish Friday afternoon.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AGENT PIPELINE -->
+<section class="pipeline-section">
+  <div class="section-label">Product Agent Pipeline</div>
+  <div class="section-title">9 agents → board-ready artifacts</div>
+  <p class="section-desc">Each agent consumes the output of the previous one. The product owner reviews and approves at every stage. Agents draft — PMs decide.</p>
+
+  <div class="pipeline">
+    <div class="phase-group discovery">
+      <div class="phase-label">Discovery</div>
+      <div class="pipe-node">
+        <div class="pipe-num">1</div>
+        <div class="pipe-name">Interview Guide</div>
+        <div class="pipe-artifact">→ interview script</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-node">
+        <div class="pipe-num">2</div>
+        <div class="pipe-name">User Insight Synthesis</div>
+        <div class="pipe-artifact">→ insights report</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-node">
+        <div class="pipe-num">3</div>
+        <div class="pipe-name">MRD Agent</div>
+        <div class="pipe-artifact">→ MRD</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-node">
+        <div class="pipe-num">4</div>
+        <div class="pipe-name">Idea Generator</div>
+        <div class="pipe-artifact">→ hypothesis tracker</div>
+      </div>
+    </div>
+    <div class="phase-arrow">›</div>
+    <div class="phase-group viability">
+      <div class="phase-label">Viability</div>
+      <div class="pipe-node">
+        <div class="pipe-num">5</div>
+        <div class="pipe-name">Journey Mapping</div>
+        <div class="pipe-artifact">→ as-is / to-be maps</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-node">
+        <div class="pipe-num">6</div>
+        <div class="pipe-name">PR-FAQ</div>
+        <div class="pipe-artifact">→ press release + FAQ</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-node">
+        <div class="pipe-num">7</div>
+        <div class="pipe-name">PRD Agent</div>
+        <div class="pipe-artifact">→ PRD</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-node">
+        <div class="pipe-num">8</div>
+        <div class="pipe-name">Figma Prompting</div>
+        <div class="pipe-artifact">→ mocks / screens</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-node">
+        <div class="pipe-num">9</div>
+        <div class="pipe-name">Rapid Prototyping</div>
+        <div class="pipe-artifact">→ prototype spec</div>
+      </div>
+    </div>
+  </div>
+
+
+</section>
+
+<!-- ACCOUNTABLE DELIVERABLES -->
+<section class="cadence-section" style="padding-top: 0; padding-bottom: 0;">
+  <div class="handoff-bar">
+    <div class="handoff-icon">⬇</div>
+    <div class="handoff-text">
+      <strong>Accountable deliverables.</strong> Friday: Product delivers the artifacts necessary for next week's work. Engineering delivers a demo. Monday: the story plan is reviewed and work begins.
+    </div>
+  </div>
+</section>
+
+<!-- WEEKLY CADENCE -->
+<section class="cadence-section">
+  <div class="section-label">Weekly Cadence</div>
+  <div class="section-title">The week at a glance</div>
+  <p class="section-desc" style="margin-bottom: 32px;">Monday and Friday are collaborative ceremonies where product and engineering work together. The middle of the week is heads-down build time. Product runs agents async throughout.</p>
+
+  <div class="week-grid">
+    <!-- MONDAY -->
+    <div class="day-card monday" style="grid-column: span 2;">
+      <div class="day-header">
+        <div class="day-name">Monday</div>
+        <div class="day-duration">1 hr meeting</div>
+      </div>
+      <div class="day-title">Refinement / Sprint Planning</div>
+      <div class="day-body">
+        <div style="font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-product); margin-bottom: 8px;">Morning — EM Prep</div>
+        <ul class="day-items">
+          <li>EM reviews artifact package received Friday — feature-specific PRD, Figma frames, prototype spec, journey maps</li>
+          <li>EM pulls Figma frames directly into LLM via Figma MCP, reviewing design intent alongside the PRD</li>
+          <li>EM creates epics & stories in Jira MCP directly from the Figma frames and PRD — each story references the specific frame and acceptance criteria</li>
+          <li>Stories scoped for LLM-compatible development so devs can pull the same Figma context while building</li>
+        </ul>
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-ceremony); margin-bottom: 8px;">Meeting — Full Team</div>
+          <ul class="day-items">
+            <li>PO walks the team through user context, problem space, and key artifacts</li>
+            <li>Team reviews the board — questions, adjustments, dependencies, priorities</li>
+            <li>Work is organized and understood — devs pull from the board as capacity allows</li>
+            <li>Devs communicate what will be completed and demoed by Friday</li>
+            <li>Teams can choose to size stories, use agents to size stories, or just use stories completed for metrics</li>
+          </ul>
+        </div>
+        <div style="margin-top: 12px;">
+          <span class="day-tag tag-viability">viability</span>
+          <span class="day-tag tag-build">build & test</span>
+          <span class="day-tag" style="background: var(--accent-product-dim); color: var(--accent-product);">em prep</span>
+          <span class="day-tag tag-ceremony">1 hr meeting</span>
+          <span class="day-tag tag-demo">ceremony</span>
+          <span class="day-tag tag-ceremony">collaborative</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TUE-THU -->
+    <div class="day-card build" style="grid-column: span 2;">
+      <div class="day-header">
+        <div class="day-name">Tue — Thu</div>
+        <div class="day-duration">full days</div>
+      </div>
+      <div class="day-title">Build + Product Prep</div>
+      <div class="day-body">
+        <ul class="day-items">
+          <li>Devs pull stories from the board and use LLM plan mode to plan story completion in LLM</li>
+          <li>LLM executes the plan — writing code, building features, and refactoring as needed</li>
+          <li>Devs review the generated code for correctness, architecture, and edge cases</li>
+          <li>LLM testing skill generates tests to team standards — devs review and verify coverage</li>
+          <li>Update Jira status as work moves through the pipeline</li>
+          <li>Async by default — sync only when blocked</li>
+          <li>EM monitors board, unblocks, stays out of the way</li>
+        </ul>
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-product); margin-bottom: 8px;">Meanwhile — Product</div>
+          <ul class="day-items product-items" style="list-style: none;">
+            <li style="position: relative; padding-left: 18px;">Runs McKinsey AI-PDLC agents to prepare next week's artifacts</li>
+            <li style="position: relative; padding-left: 18px;">Conducts or synthesizes user interviews</li>
+            <li style="position: relative; padding-left: 18px;">Drafts and reviews MRDs, PRDs, mocks, and prototype specs</li>
+            <li style="position: relative; padding-left: 18px;">Iterates until the artifact package is ready to deliver to EM on Friday</li>
+          </ul>
+        </div>
+        <div style="margin-top: 12px;">
+          <span class="day-tag tag-build">build & test</span>
+          <span class="day-tag tag-discovery">discovery</span>
+          <span class="day-tag tag-viability">viability</span>
+          <span class="day-tag tag-eng">heads down</span>
+          <span class="day-tag tag-eng">jira = source of truth</span>
+          <span class="day-tag" style="background: var(--accent-product-dim); color: var(--accent-product);">product preps next week</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRIDAY AM -->
+    <div class="day-card friday-am">
+      <div class="day-header">
+        <div class="day-name">Fri AM</div>
+        <div class="day-duration">1 hr</div>
+      </div>
+      <div class="day-title">Demo</div>
+      <div class="day-body">
+        <ul class="day-items">
+          <li>Live software demos against acceptance criteria & mocks</li>
+          <li>PO gives real-time feedback</li>
+          <li>What shipped, what needs tweaks, what carries over</li>
+          <li>Resolve Trivial Feedback</li>
+          <li>Take non-trivial PO feedback and create stories to resolve</li>
+        </ul>
+        <div style="margin-top: 12px;">
+          <span class="day-tag tag-build">build & test</span>
+          <span class="day-tag tag-demo">ceremony</span>
+          <span class="day-tag tag-demo">live demos only</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRIDAY PM -->
+    <div class="day-card friday-pm">
+      <div class="day-header">
+        <div class="day-name">Fri PM</div>
+        <div class="day-duration">2–3 hrs</div>
+      </div>
+      <div class="day-title">Tweak & Polish</div>
+      <div class="day-body">
+        <ul class="day-items">
+          <li>Product + devs collaborate on targeted fixes from demo feedback</li>
+          <li>PO works alongside devs for rapid clarification</li>
+          <li>No new feature work — polish only</li>
+        </ul>
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-product); margin-bottom: 8px;">End of Day — Next Week Prep</div>
+          <ul class="day-items product-items" style="list-style: none;">
+            <li style="position: relative; padding-left: 18px;">PO delivers next week's artifact package to the EM — PRD, mocks, prototype spec, journey maps</li>
+            <li style="position: relative; padding-left: 18px;">EM has the weekend + Monday morning to review, refine, and organize the board</li>
+          </ul>
+        </div>
+        <div style="margin-top: 12px;">
+          <span class="day-tag tag-build">build & test</span>
+          <span class="day-tag tag-eng">buffer</span>
+          <span class="day-tag" style="background: var(--accent-product-dim); color: var(--accent-product);">artifact delivery</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASYNC BAR -->
+  <div class="async-bar">
+    <div class="async-label">Ongoing — Product</div>
+    <div class="async-flow">
+      <span class="async-step">Interviews</span>
+      <span class="async-arrow">→</span>
+      <span class="async-step">Artifacts</span>
+      <span class="async-arrow">→</span>
+      <span class="async-step">Prototypes</span>
+      <span class="async-arrow">→</span>
+      <span class="async-step">Feedback</span>
+    </div>
+    <div class="async-note">runs parallel to engineering kanban</div>
+  </div>
+   <div class="async-bar">
+    <div class="async-label">Ongoing — Engineering</div>
+    <div class="async-flow">
+      <span class="async-step">Story building</span>
+      <span class="async-arrow">→</span>
+      <span class="async-step">Development</span>
+      <span class="async-arrow">→</span>
+      <span class="async-step">QA</span>
+      <span class="async-arrow">→</span>
+      <span class="async-step">Demos</span>
+    </div>
+    <div class="async-note">runs parallel to product kanban</div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section class="roles-section">
+  <div class="section-label">Roles</div>
+  <div class="section-title" style="margin-bottom: 28px;">Who does what</div>
+  <div class="roles-grid">
+    <div class="role-card">
+      <div class="role-icon">◈</div>
+      <div class="role-name">Product Owner</div>
+      <div class="role-desc">Operates the 9-agent pipeline. Reviews every agent output before it feeds into the next. Delivers the full artifact package to the EM end of day Friday. Walks the team through user context and problem space in Monday's planning meeting. Provides real-time feedback at Friday demo. Partners with devs on Friday afternoon polish. Owns prioritization and the hypothesis tracker.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">◆</div>
+      <div class="role-name">Engineering Manager</div>
+      <div class="role-desc">Receives artifacts from product end of day Friday. Reviews Figma frames via Figma MCP in LLM alongside the feature-specific PRD. Creates epics & stories in Jira MCP directly from the frames and PRD. Facilitates the 1-hour Monday refinement meeting. Monitors the board and unblocks during the week. Runs Friday demo. Tracks throughput and flow. Protects build days from interruption.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">▣</div>
+      <div class="role-name">Developers</div>
+      <div class="role-desc">Review the board in Monday's planning meeting — ask questions, flag concerns, clarify priorities. Pull stories and build in LLM as capacity allows. Update Jira status. Write tests as part of story completion. Demo their work Friday. Partner with product on Friday afternoon polish.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLING -->
+<section class="tools-section">
+  <div class="section-label">Tooling</div>
+  <div class="section-title" style="margin-bottom: 24px;">Stack</div>
+  <div class="tools-row">
+    <div class="tool-chip">
+      <div class="tool-icon">⬡</div>
+      <div class="tool-info">
+        <div class="tool-name">AI-PDLC GEM Agents</div>
+        <div class="tool-use">LLM slash commands · product pipeline</div>
+      </div>
+    </div>
+    <div class="tool-chip">
+      <div class="tool-icon">◫</div>
+      <div class="tool-info">
+        <div class="tool-name">Figma Make</div>
+        <div class="tool-use">Mocks & prototype screens</div>
+      </div>
+    </div>
+    <div class="tool-chip">
+      <div class="tool-icon">◫</div>
+      <div class="tool-info">
+        <div class="tool-name">Figma MCP Server</div>
+        <div class="tool-use">Design context in LLM · frames → code · EM story creation</div>
+      </div>
+    </div>
+    <div class="tool-chip">
+      <div class="tool-icon">◧</div>
+      <div class="tool-info">
+        <div class="tool-name">Jira + MCP</div>
+        <div class="tool-use">Kanban board & tracking · EM creates stories</div>
+      </div>
+    </div>
+    <div class="tool-chip">
+      <div class="tool-icon">▤</div>
+      <div class="tool-info">
+        <div class="tool-name">LLM</div>
+        <div class="tool-use">AI-assisted IDE · build execution</div>
+      </div>
+    </div>
+    <div class="tool-chip">
+      <div class="tool-icon">◰</div>
+      <div class="tool-info">
+        <div class="tool-name">Slack</div>
+        <div class="tool-use">Async comms · sync only when blocked</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="roles-section">
+  <div class="section-label">Measurement</div>
+  <div class="section-title" style="margin-bottom: 8px;">Measurement (Based on DX Core 4 Framework)</div>
+  <p class="section-desc" style="margin-bottom: 28px; max-width: 700px;">Four metrics measured across the weekly cadence. The first three are observable within the workflow itself. Business impact requires a longer time horizon and lives with product.</p>
+  <div class="roles-grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="role-card" style="border-top: 3px solid #60a5fa;">
+      <div style="font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #60a5fa; margin-bottom: 12px;">Speed</div>
+      <div class="role-name">Throughput</div>
+      <div class="role-desc">Stories completed per week on the kanban board. Visible in Jira. The simplest measure of whether the pipeline is flowing.</div>
+      <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);">
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-muted);">Measured</div>
+        <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Weekly via kanban tool</div>
+      </div>
+    </div>
+    <div class="role-card" style="border-top: 3px solid #5eead4;">
+      <div style="font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #5eead4; margin-bottom: 12px;">Effectiveness</div>
+      <div class="role-name">Non-Trivial Demo Issues</div>
+      <div class="role-desc">Count of non-trivial issues surfaced in Friday demo. High count signals a breakdown in communication between product artifacts and engineering understanding. This measures the quality of the collaboration, not just the output.</div>
+      <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);">
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-muted);">Measured</div>
+        <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Every Friday demo</div>
+      </div>
+    </div>
+    <div class="role-card" style="border-top: 3px solid #93c5fd;">
+      <div style="font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #93c5fd; margin-bottom: 12px;">Quality</div>
+      <div class="role-name">Client-Found Defects + Test Coverage</div>
+      <div class="role-desc">Count of client-found defects (CFDs) that make it past the team into production. Test coverage as the leading indicator, CFD count as the lagging one. Together they measure whether the human-verifies-AI loop is catching things.</div>
+      <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);">
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-muted);">Measured</div>
+        <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Count of CFDs, post-release</div>
+      </div>
+    </div>
+    <div class="role-card" style="border-top: 3px solid var(--accent-product);">
+      <div style="font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-product); margin-bottom: 12px;">Business Impact</div>
+      <div class="role-name">Product-Defined Outcomes</div>
+      <div class="role-desc">Success criteria defined by product in the MRD and hypothesis tracker (revenue per dev, ROI, innovation ratio). The agents generate the success criteria, the product team verifies whether they were met.</div>
+      <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);">
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-muted);">Measured</div>
+        <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Owned by product, longer horizon</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRINCIPLE -->
+<section class="principle-section">
+  <div class="principle-card">
+    <p class="principle-quote">Every artifact is AI-generated. Every artifact is human-verified.<br>The agents do the work. The team — product and engineering — own the outcome together.</p>
+    <p class="principle-source">AI-PDLC Weekly Workflow — Core Principle</p>
+  </div>
+</section>
+
+</body>
+</html>
