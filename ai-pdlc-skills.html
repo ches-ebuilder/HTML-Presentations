@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Example Skills Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181a21;
+    --surface-hover: #1e2029;
+    --border: #2a2d38;
+    --border-active: #4a6cf7;
+    --text: #e2e4ea;
+    --text-muted: #8b8fa3;
+    --text-dim: #5c6078;
+    --accent: #4a6cf7;
+    --accent-glow: rgba(74, 108, 247, 0.15);
+    --accent-text: #8fa4ff;
+    --green: #34d399;
+    --green-dim: rgba(52, 211, 153, 0.12);
+    --orange: #f59e0b;
+    --orange-dim: rgba(245, 158, 11, 0.12);
+    --red: #f87171;
+    --code-bg: #12131a;
+    --tab-bg: #14161d;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  .page-header {
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 0 2rem;
+    background: linear-gradient(180deg, rgba(74,108,247,0.04) 0%, transparent 100%);
+  }
+
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .header-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: var(--accent-glow);
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+  }
+
+  .header-top h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .header-sub {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    max-width: 640px;
+  }
+
+  .header-sub a {
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  /* ─── Sections ─── */
+  .section {
+    padding: 2.5rem 0;
+  }
+
+  .section + .section {
+    border-top: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.01em;
+  }
+
+  .section-desc {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin-bottom: 1.5rem;
+    max-width: 640px;
+  }
+
+  /* ─── Skills Tabs ─── */
+  .skills-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .tab-bar {
+    display: flex;
+    overflow-x: auto;
+    background: var(--tab-bg);
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    font-weight: 500;
+    padding: 0.75rem 0.8rem;
+    flex: 1;
+    text-align: center;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    position: relative;
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+  }
+
+  .tab-btn.active {
+    color: var(--accent-text);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-content {
+    display: none;
+    padding: 0;
+  }
+  .tab-content.active { display: block; }
+
+  .skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .skill-meta h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+
+  .skill-meta p {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    max-width: 560px;
+  }
+
+  .copy-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .copy-btn:hover { background: #3b5de6; }
+  .copy-btn:active { transform: scale(0.97); }
+  .copy-btn.copied {
+    background: var(--green);
+    color: #0f1117;
+  }
+
+  .skill-code-wrap {
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .skill-code-wrap::-webkit-scrollbar {
+    width: 6px;
+  }
+  .skill-code-wrap::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+
+  .skill-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    padding: 1.25rem 1.5rem;
+    background: var(--code-bg);
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+  }
+
+  /* ─── Setup Instructions ─── */
+  .setup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .setup-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .setup-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .tool-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .tool-icon.cursor { background: #2a2d38; color: #e2e4ea; }
+  .tool-icon.claude { background: rgba(217, 119, 87, 0.15); color: #d97757; }
+  .tool-icon.gemini { background: rgba(66, 133, 244, 0.15); color: #4285f4; }
+
+  .setup-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .setup-card h4 {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 1rem 0 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .setup-card h4:first-of-type { margin-top: 0; }
+
+  .setup-card p, .setup-card li {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .setup-card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .setup-card li {
+    padding-left: 1.1rem;
+    position: relative;
+    margin-bottom: 0.35rem;
+  }
+
+  .setup-card li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent-text);
+    font-weight: 600;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    color: var(--accent-text);
+  }
+
+  .inline-cmd {
+    display: block;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.85rem;
+    margin: 0.5rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* ─── Portability Table ─── */
+  .compat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  .compat-table th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compat-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .compat-table tr:last-child td { border-bottom: none; }
+
+  .compat-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text);
+  }
+
+  .badge-yes {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--green);
+    background: var(--green-dim);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .badge-opt {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--orange);
+    background: var(--orange-dim);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  /* ─── LLM Install ─── */
+  .llm-prompt-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    margin: 0.75rem 0;
+    position: relative;
+  }
+
+  .llm-prompt-box pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+  }
+
+  .llm-prompt-copy {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .llm-prompt-copy:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .llm-prompt-copy.copied {
+    color: var(--green);
+    border-color: var(--green);
+  }
+
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+  }
+
+  .footer a {
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  @media (max-width: 640px) {
+    .header-top h1 { font-size: 1.25rem; }
+    .tab-btn { padding: 0.7rem 0.85rem; font-size: 0.72rem; }
+    .skill-header { padding: 1rem; }
+    .skill-code { padding: 1rem; font-size: 0.72rem; }
+    .setup-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="container">
+    <div class="header-top">
+      <span class="header-badge">AI-PDLC T2</span>
+      <h1>Example Skills Reference</h1>
+    </div>
+    <p class="header-sub">Seven example SKILL.md files for the AI Product Development Lifecycle. Works with Cursor, Claude Code, and Gemini. Use these as-is or as examples to create your own versions of skills. See below for how to add them to your system.</p>
+  </div>
+</header>
+
+<!-- ─── Skills ─── -->
+<div class="section">
+  <div class="container">
+    <!-- ─── Skills Tabs ─── -->
+    <div class="skills-panel">
+      <div class="tab-bar" id="tabBar"></div>
+      <div id="tabContents"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Setup Instructions ─── -->
+<div class="section">
+  <div class="container">
+    <h2 class="section-title">Installation</h2>
+    <p class="section-desc">Two ways to install: manually copy the files, or ask your LLM to do it for you.</p>
+
+    <div class="setup-grid">
+      <!-- Cursor -->
+      <div class="setup-card">
+        <div class="setup-card-header">
+          <div class="tool-icon cursor">C</div>
+          <h3>Cursor</h3>
+        </div>
+        <h4>Manual Install</h4>
+        <ul>
+          <li>Create <code>.cursor/skills/{skill-name}/SKILL.md</code> for each skill</li>
+          <li>Copy the full SKILL.md content into each file</li>
+          <li>Restart Cursor to discover new skills</li>
+          <li>Invoke with <code>/skill-name</code> in chat</li>
+        </ul>
+        <h4>Cross-Tool Directory</h4>
+        <ul>
+          <li>Alternatively use <code>.agents/skills/</code> — Cursor auto-discovers this path</li>
+          <li>This directory is also scanned by Claude Code and Gemini</li>
+        </ul>
+        <h4>Ask the LLM</h4>
+        <div class="llm-prompt-box">
+          <button class="llm-prompt-copy" onclick="copyPrompt(this)">Copy</button>
+          <pre>Create a new Cursor skill at .cursor/skills/plan-tests/SKILL.md with the following content:
+
+[paste SKILL.md content here]</pre>
+        </div>
+      </div>
+
+      <!-- Claude Code -->
+      <div class="setup-card">
+        <div class="setup-card-header">
+          <div class="tool-icon claude">A</div>
+          <h3>Claude Code</h3>
+        </div>
+        <h4>Manual Install</h4>
+        <ul>
+          <li>Create <code>.claude/skills/{skill-name}/SKILL.md</code> for each skill</li>
+          <li>Copy the full SKILL.md content into each file</li>
+          <li>Skills are discovered automatically — no restart needed</li>
+          <li>Invoke with <code>/skill-name</code> in the terminal</li>
+        </ul>
+        <h4>Cross-Tool Directory</h4>
+        <ul>
+          <li><code>.agents/skills/</code> is also supported via symlink</li>
+        </ul>
+        <h4>Ask the LLM</h4>
+        <div class="llm-prompt-box">
+          <button class="llm-prompt-copy" onclick="copyPrompt(this)">Copy</button>
+          <pre>Create a new skill at .claude/skills/plan-tests/SKILL.md with the following content:
+
+[paste SKILL.md content here]</pre>
+        </div>
+      </div>
+
+      <!-- Gemini -->
+      <div class="setup-card">
+        <div class="setup-card-header">
+          <div class="tool-icon gemini">G</div>
+          <h3>Gemini</h3>
+        </div>
+        <h4>Manual Install</h4>
+        <ul>
+          <li>Create <code>.gemini/skills/{skill-name}/SKILL.md</code> for each skill</li>
+          <li>Or use the cross-tool <code>.agents/skills/</code> alias</li>
+          <li>Gemini auto-discovers skills based on description</li>
+          <li>Confirm activation when prompted</li>
+          <li>Manage with <code>/skills list</code> and <code>/skills enable</code></li>
+        </ul>
+        <h4>Global Install</h4>
+        <ul>
+          <li>Place in <code>~/.gemini/skills/</code> for access across all projects</li>
+        </ul>
+        <h4>Ask the LLM</h4>
+        <div class="llm-prompt-box">
+          <button class="llm-prompt-copy" onclick="copyPrompt(this)">Copy</button>
+          <pre>Create a new skill at .gemini/skills/plan-tests/SKILL.md with the following content:
+
+[paste SKILL.md content here]</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ─── Key Principles ─── -->
+<div class="section">
+  <div class="container">
+    <h2 class="section-title">Design Principles</h2>
+    <p class="section-desc">Every skill in this collection follows these four principles.</p>
+    <div class="setup-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      <div class="setup-card">
+        <h3>Infer, don't hardcode</h3>
+        <p>Conventions are derived from the codebase at runtime, not maintained in static config. This keeps skills portable across projects.</p>
+      </div>
+      <div class="setup-card">
+        <h3>Separate planning from implementation</h3>
+        <p>Reviewing a plan is fast and high-signal. Reviewing generated code without a plan is slow and error-prone.</p>
+      </div>
+      <div class="setup-card">
+        <h3>Automate context gathering</h3>
+        <p>Business context comes from Jira MCP. Technical context comes from scanning the codebase. Engineers review output, not assemble input.</p>
+      </div>
+      <div class="setup-card">
+        <h3>Think beyond functional tests</h3>
+        <p>Always assess whether performance, load, or concurrency tests are warranted for the code under test.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    Example Skills Reference · Chesleigh Denison
+  </div>
+</footer>
+
+<script>
+const skills = [
+  {
+    name: "pull-stories",
+    title: "Pull Stories",
+    desc: "Fetch stories from Jira MCP and convert to Markdown for LLM context.",
+    content: `---
+name: pull-stories
+description: Pull user stories from Jira and convert them to Markdown for LLM context. Use when beginning backlog refinement or sprint planning and you need story content locally.
+---
+
+# Pull Stories
+
+Pull user stories from Jira and convert them to Markdown files for LLM context.
+
+## Prerequisites
+
+Before running, verify the following tools are available:
+
+1. **Jira MCP** — Required. If not connected, stop and tell the user:
+   > "Jira MCP is not configured. Set up the Jira MCP server before using this skill. See: https://github.com/atlassian/mcp-server-atlassian"
+
+## Workflow
+
+### Step 1: Identify Stories to Pull
+
+Ask the user for one of:
+- A Jira sprint name or ID
+- A Jira epic key (e.g., \`PROJ-123\`)
+- A JQL query (e.g., \`project = PROJ AND sprint in openSprints()\`)
+- A list of specific story keys
+
+### Step 2: Fetch Stories from Jira
+
+Use the Jira MCP to fetch the stories. For each story, retrieve:
+- Summary (title)
+- Description
+- Acceptance criteria
+- Story points
+- Labels and components
+- Linked issues (blockers, dependencies)
+- Epic link
+- Subtasks
+- Comments (latest 5, if any contain requirements context)
+- Attachments list (names only — flag for manual review)
+
+### Step 3: Convert to Markdown
+
+For each story, generate a Markdown file using this structure:
+
+\`\`\`markdown
+# [STORY-KEY]: [Summary]
+
+**Epic:** [Epic Key] — [Epic Summary]
+**Points:** [Story Points] | **Labels:** [Labels] | **Components:** [Components]
+**Status:** [Status]
+
+## Description
+
+[Description body — preserve original formatting]
+
+## Acceptance Criteria
+
+[Acceptance criteria — convert to checkbox list if not already]
+
+- [ ] Criteria 1
+- [ ] Criteria 2
+
+## Dependencies
+
+[List linked blockers and dependencies with their status]
+
+- **Blocked by:** PROJ-456 (In Progress) — [Summary]
+- **Relates to:** PROJ-789 (Done) — [Summary]
+
+## Notes
+
+[Relevant comments summarized, if any]
+
+## Attachments
+
+[List attachment filenames — flag for manual review]
+\`\`\`
+
+### Step 4: Save Files
+
+Save all Markdown files to a \`stories/\` directory in the current working directory:
+- Filename format: \`[STORY-KEY].md\` (e.g., \`PROJ-101.md\`)
+- Create a \`stories/index.md\` that lists all pulled stories with their key, title, status, and points
+
+### Step 5: Summary
+
+After pulling, output:
+- Total stories pulled
+- Stories with missing acceptance criteria (flag these)
+- Stories with unresolved blockers
+- Stories with attachments that may need manual review`
+  },
+  {
+    name: "plan-story",
+    title: "Plan Story",
+    desc: "Refine a single story — identify gaps, edge cases, and split recommendations.",
+    content: `---
+name: plan-story
+description: Refine a single user story by identifying missing requirements, edge cases, and whether it should be split. Use during backlog refinement to ensure stories are fully refined before entering a sprint.
+---
+
+# Plan Story
+
+Refine a single user story for sprint readiness. Identify gaps, missing requirements, edge cases, and determine if the story should be split.
+
+## Prerequisites
+
+Before running, verify the following tools are available:
+
+1. **Jira MCP** — Required for pushing changes back. If not connected, stop and tell the user:
+   > "Jira MCP is not configured. Set up the Jira MCP server before using this skill. See: https://github.com/atlassian/mcp-server-atlassian"
+2. **Repository context** — This skill must be run from within the repository where the work will take place. The codebase is essential context for identifying implementation concerns.
+
+## Inputs
+
+The user provides one of:
+- A story Markdown file (from \`/pull-stories\`)
+- A Jira story key (skill will fetch via MCP)
+- Story content pasted directly
+
+## Workflow
+
+### Step 1: Understand the Story
+
+Read the story in full. Then scan the repository to understand:
+- What area of the codebase this story affects
+- Existing patterns, interfaces, and abstractions in that area
+- Related test coverage
+- Recent changes in the affected files (use git log if available)
+
+### Step 2: Identify Missing Requirements
+
+Evaluate the story against these dimensions:
+
+**Completeness**
+- Are acceptance criteria specific and testable?
+- Are input/output expectations defined?
+- Are error states and edge cases covered?
+- Are there implicit requirements not written down?
+
+**Technical Feasibility**
+- Does the story align with existing architecture?
+- Are there hidden dependencies on other stories or services?
+- Does it require changes to shared interfaces or data models?
+- Are there performance implications?
+
+**Scope**
+- Is this story small enough for a single sprint?
+- Does it mix unrelated concerns (e.g., UI + API + data migration)?
+- Should it be split into multiple stories? If so, propose the split with clear boundaries.
+
+**Edge Cases**
+Ask: *"What edge cases are not covered in this story?"*
+Consider: null/empty inputs, concurrent access, partial failures, authorization boundaries, backward compatibility, data migration paths.
+
+### Step 3: Generate Refinement Report
+
+Output a structured report:
+
+\`\`\`markdown
+# Refinement Report: [STORY-KEY]
+
+## Summary
+[One-line assessment: Ready / Needs Work / Should Split]
+
+## Missing Requirements
+- [Requirement 1 — why it's needed]
+- [Requirement 2 — why it's needed]
+
+## Edge Cases Not Covered
+- [Edge case 1]
+- [Edge case 2]
+
+## Dependencies Identified
+- [Dependency 1 — status and risk]
+
+## Recommended Acceptance Criteria Additions
+- [ ] [New AC 1]
+- [ ] [New AC 2]
+
+## Split Recommendation
+[If applicable: proposed story breakdown with scope for each]
+
+## Questions for Product
+[Any ambiguities that require product input]
+\`\`\`
+
+### Step 4: Human Review
+
+Present the refinement report for engineer review. Do not push any changes to Jira until the engineer confirms.
+
+### Step 5: Push to Jira
+
+After confirmation, use the Jira MCP to:
+- Update acceptance criteria
+- Add new edge case notes to the description
+- Create new stories if a split was approved
+- Link split stories to the original
+- Add a comment summarizing the refinement`
+  },
+  {
+    name: "plan-story-implementation",
+    title: "Plan Story Implementation",
+    desc: "Generate sprint implementation plan with critical path, dependencies, and file changes.",
+    content: `---
+name: plan-story-implementation
+description: Generate a structured implementation plan for sprint stories. Identifies critical path, blocking dependencies, file changes, and sequencing. Use during sprint planning after stories are refined.
+---
+
+# Plan Story Implementation
+
+Generate a structured implementation plan for one or more sprint stories. Identifies critical path, dependencies, file changes, and sequencing.
+
+## Prerequisites
+
+Before running, verify the following tools are available:
+
+1. **Jira MCP** — Optional but recommended. Used to fetch stories and push plan updates. If not connected, inform the user:
+   > "Jira MCP is not connected. You can still use this skill with local Markdown story files, but automatic Jira sync is unavailable."
+2. **Repository context** — Required. This skill must be run from within the repository where the work will take place.
+
+## Inputs
+
+The user provides one of:
+- A sprint name or ID (fetched via Jira MCP)
+- A set of story Markdown files (from \`/pull-stories\`)
+- A list of Jira story keys
+
+## Workflow
+
+### Step 1: Load Stories
+
+Load all stories for the sprint. For each story, gather:
+- Summary, description, acceptance criteria
+- Dependencies and blockers
+- Story points
+
+### Step 2: Scan the Codebase
+
+For each story, identify:
+- **Affected files** — Which files will need to be created or modified?
+- **Existing patterns** — What conventions exist in the affected area? (naming, structure, error handling, logging)
+- **Shared interfaces** — Does this touch shared code that other stories also depend on?
+- **Test coverage** — What tests exist for the affected area?
+
+### Step 3: Generate the Implementation Plan
+
+Produce a plan covering the following for each story:
+
+**Implementation Steps**
+- Back-end changes (services, APIs, data access)
+- Front-end changes (components, state, routing)
+- Tests (unit, integration — reference the test planning skill for details)
+
+**File Changes**
+- Files to modify (with brief description of change)
+- Files to create
+- Files that may be affected indirectly (shared utilities, types, configs)
+
+**Validation Steps**
+- How to verify the implementation works
+- Manual testing steps if applicable
+- Automated test expectations
+
+### Step 4: Identify Critical Path and Dependencies
+
+Across all stories in the sprint:
+- Map inter-story dependencies (which stories block others)
+- Identify the critical path (longest dependency chain)
+- Flag parallel work opportunities (stories with no shared dependencies)
+- Recommend implementation order
+
+### Step 5: Output the Plan
+
+Save the plan as a Markdown file: \`plan.md\` in the working directory.
+
+\`\`\`markdown
+# Sprint Implementation Plan: [Sprint Name]
+
+## Critical Path
+[Ordered list of stories on the critical path]
+
+## Parallel Tracks
+[Groups of stories that can be worked simultaneously]
+
+## Story Plans
+
+### [STORY-KEY]: [Summary]
+
+**Implementation Steps**
+1. [Step with file and description]
+2. [Step with file and description]
+
+**Files to Change**
+- \`src/api/handler.ts\` — Add new endpoint
+- \`src/services/processor.ts\` — Extend processing logic
+
+**Files to Create**
+- \`src/api/validators/newValidator.ts\`
+- \`src/tests/handler.test.ts\`
+
+**Validation**
+- [ ] Unit tests pass
+- [ ] Integration test covers AC #1 and #2
+- [ ] Manual verification of [scenario]
+
+**Dependencies**
+- Blocked by: [STORY-KEY] (shared interface change)
+- Blocks: [STORY-KEY]
+
+---
+[Repeat for each story]
+\`\`\`
+
+### Step 6: Human Review
+
+Present the plan to the tech lead and team. Do not proceed to implementation until the plan is reviewed.
+
+### Step 7: Push Updates (Optional)
+
+If Jira MCP is connected and the user confirms:
+- Attach \`plan.md\` to the sprint epic or a designated Jira ticket
+- Update story descriptions with implementation notes
+- Adjust story sequencing based on critical path findings
+
+## Scope Guardrails
+
+A plan generated by this skill should cover:
+- Implementation steps (back-end, front-end, tests)
+- Necessary file changes
+- Validation steps
+
+A plan should **NOT** include:
+- Release notes
+- Deployment pipelines
+- Architecture refactoring (those are epic-level concerns)`
+  },
+  {
+    name: "plan-tests",
+    title: "Plan Tests",
+    desc: "Generate a structured test plan by scanning codebase conventions and pulling AC from Jira.",
+    content: `---
+name: plan-tests
+description: Generate a structured test plan for a user story by scanning the codebase for conventions, pulling business context from Jira, identifying coverage gaps, and producing edge case and performance test recommendations. Use before writing any test code.
+---
+
+# Plan Tests
+
+Generate a structured test plan for a user story. This skill plans tests — it does not write them. The output is a \`plan.md\` file for human review before any test code is generated.
+
+## Prerequisites
+
+Before running, verify the following tools are available:
+
+1. **Jira MCP** — Required for pulling story context. If not connected, stop and tell the user:
+   > "Jira MCP is not configured. Set up the Jira MCP server before using this skill. See: https://github.com/atlassian/mcp-server-atlassian"
+   >
+   > You can still use this skill by providing story content directly, but automatic context gathering will be unavailable.
+2. **Repository context** — Required. This skill must be run from within the repository where the code under test lives.
+
+## Inputs
+
+The user provides one of:
+- A Jira story key (skill fetches via MCP)
+- A story Markdown file (from \`/pull-stories\`)
+- Story content pasted directly
+
+Optionally:
+- Specific files or modules to focus on
+- An existing implementation plan (\`plan.md\` from \`/plan-story-implementation\`)
+
+## Workflow
+
+### Step 1: Derive Conventions from the Codebase
+
+Scan existing test files in the repository to infer:
+- **Test framework** — Jest, Vitest, JUnit 5, pytest, Mocha, etc.
+- **Naming patterns** — \`*.test.ts\`, \`*.spec.ts\`, \`*Test.java\`, \`test_*.py\`, etc.
+- **File organization** — Co-located with source? Separate \`__tests__/\` or \`test/\` directory?
+- **Mocking strategies** — \`jest.mock\`, Mockito, \`unittest.mock\`, test doubles, etc.
+- **Assertion patterns** — \`expect().toBe()\`, \`assertThat()\`, \`assert\`, etc.
+- **Setup/teardown patterns** — \`beforeEach\`, \`@BeforeAll\`, fixtures, factories
+- **Test data patterns** — Factories, builders, fixtures, inline data
+
+Do NOT hardcode or assume any of these. The codebase is the source of truth.
+
+### Step 2: Pull Business Context
+
+If Jira MCP is available, fetch:
+- User story description
+- Acceptance criteria
+- Linked requirements or parent epic context
+- Comments that clarify requirements
+
+This eliminates tests that verify code structure instead of intended behavior. Every test case should trace back to a business requirement or a realistic failure scenario.
+
+### Step 3: Identify Test Boundaries
+
+Review existing test coverage in the affected area:
+- What is already tested?
+- What files or functions have zero coverage?
+- Are there tests that overlap or duplicate existing coverage?
+
+Focus the plan on gaps. Do not re-cover what is already validated.
+
+### Step 4: Generate Test Scenarios
+
+For each testable aspect of the story, generate scenarios across these categories:
+
+**Acceptance Criteria Tests**
+- One or more test cases per acceptance criterion
+- Each case should verify the intended behavior, not code structure
+
+**Edge Cases**
+- Invalid input types
+- Empty, null, or undefined values
+- Boundary values (min, max, zero, negative, overflow)
+- Unicode, special characters, extremely long strings
+- Concurrent access or race conditions (if applicable)
+
+**Error Handling**
+- Network failures, timeouts
+- Upstream service errors
+- Invalid state transitions
+- Authorization failures
+- Malformed data from external sources
+
+**Rainy-Day Scenarios**
+- Partial failures (some items succeed, some fail)
+- Retry behavior
+- Graceful degradation
+- Data consistency under failure
+
+### Step 5: Assess Performance Testing Needs
+
+Evaluate whether the code under test warrants performance tests based on:
+- SLA requirements (response time, throughput)
+- Data volume (batch processing, large payloads)
+- API response time expectations
+- Resource-intensive operations (CPU, memory, I/O)
+- Concurrency requirements
+
+If performance tests are warranted, include them in the plan with specific metrics to validate.
+
+### Step 6: Output the Plan
+
+Save to \`plan.md\` in the working directory:
+
+\`\`\`markdown
+# Test Plan: [STORY-KEY] — [Summary]
+
+## Detected Conventions
+- **Framework:** [e.g., Jest + ts-jest]
+- **Naming:** [e.g., *.test.ts, co-located]
+- **Mocking:** [e.g., jest.mock for modules, manual mocks for services]
+- **Assertions:** [e.g., expect().toBe/toEqual/toThrow]
+
+## Test Cases
+
+### Acceptance Criteria
+| # | AC Reference | Test Description | Priority |
+|---|-------------|-----------------|----------|
+| 1 | AC-1 | [Description] | High |
+| 2 | AC-2 | [Description] | High |
+
+### Edge Cases
+| # | Scenario | Test Description | Priority |
+|---|---------|-----------------|----------|
+| 1 | Empty input | [Description] | Medium |
+| 2 | Null values | [Description] | Medium |
+
+### Error Handling
+| # | Failure Mode | Test Description | Priority |
+|---|-------------|-----------------|----------|
+| 1 | Network timeout | [Description] | High |
+| 2 | Auth failure | [Description] | Medium |
+
+### Performance (if applicable)
+| # | Metric | Target | Test Description |
+|---|--------|--------|-----------------|
+| 1 | Response time | <200ms | [Description] |
+
+## Dependencies & Setup
+- Mocks needed: [list]
+- Fixtures needed: [list]
+- Environment config: [list]
+
+## Coverage Gaps Identified
+- [Gap 1 — existing code with no test coverage]
+- [Gap 2]
+
+## Out of Scope
+- [Tests explicitly excluded and why]
+\`\`\`
+
+### Step 7: Human Review
+
+This file is a human-in-the-loop checkpoint. The engineer reviews and adjusts the plan before any test code is generated. Present the plan and ask:
+- Are any test cases unnecessary?
+- Are there scenarios missing?
+- Should priorities be adjusted?
+- Are the performance test thresholds correct?`
+  },
+  {
+    name: "implement-tests",
+    title: "Implement Tests",
+    desc: "Implement tests in batches from an approved plan.md, following codebase conventions.",
+    content: `---
+name: implement-tests
+description: Implement test code from an approved test plan (plan.md). Generates tests incrementally in batches, following conventions detected by the test planner. Use after /plan-tests has been reviewed and approved.
+---
+
+# Implement Tests
+
+Implement test code from an approved test plan. This skill consumes a \`plan.md\` generated by \`/plan-tests\` and writes tests incrementally, following the conventions and frameworks identified by the planner.
+
+## Prerequisites
+
+Before running, verify the following:
+
+1. **An approved test plan** — Required. Look for \`plan.md\` in the working directory. If not found, stop and tell the user:
+   > "No test plan found. Run \`/plan-tests\` first to generate a plan, review it, then invoke this skill."
+2. **Repository context** — Required. This skill must be run from within the repository where the tests will live.
+
+## Inputs
+
+- \`plan.md\` — The approved test plan (required)
+- Optionally: specific test categories to implement (e.g., "just the acceptance criteria tests" or "skip performance tests")
+
+## Workflow
+
+### Step 1: Read the Plan
+
+Parse \`plan.md\` to extract:
+- Detected conventions (framework, naming, mocking, assertions)
+- Test cases organized by category and priority
+- Dependencies and setup requirements
+- Performance test specifications (if any)
+
+### Step 2: Scan for Current Conventions
+
+Even though the plan includes detected conventions, re-scan the codebase to confirm:
+- The framework and patterns haven't changed since planning
+- New tests added since planning don't overlap with the plan
+- Import paths and module structure are current
+
+If conventions have shifted since the plan was written, inform the user and follow the current codebase conventions.
+
+### Step 3: Implement in Batches
+
+Generate tests incrementally, not all at once. Batch by category in this order:
+
+**Batch 1: Acceptance Criteria Tests (High Priority)**
+- Implement all AC tests first — these are the core business validation
+- After generating, pause for the engineer to review and run them
+
+**Batch 2: Error Handling Tests**
+- Implement error path and failure mode tests
+- After generating, pause for review
+
+**Batch 3: Edge Case Tests**
+- Implement edge case and boundary tests
+- After generating, pause for review
+
+**Batch 4: Performance Tests (if applicable)**
+- Implement any performance tests specified in the plan
+- After generating, pause for review
+
+For each batch:
+1. Write the test files following detected conventions
+2. Ensure imports, mocks, and setup match existing patterns
+3. Present the generated code to the engineer
+4. Wait for confirmation before proceeding to the next batch
+
+### Step 4: Follow Detected Standards
+
+For each test file generated:
+
+**Structure**
+- Place files according to the project's test organization (co-located, \`__tests__/\`, \`test/\`, etc.)
+- Name files according to detected naming patterns
+- Group related tests using the project's grouping convention (\`describe\`, \`@Nested\`, \`class\`, etc.)
+
+**Mocking**
+- Use the mocking strategy found in existing tests
+- Do not introduce new mocking libraries or patterns
+- Mirror the level of abstraction in existing mocks
+
+**Assertions**
+- Use the assertion style found in existing tests
+- Match specificity level (e.g., if existing tests use \`toEqual\` over \`toBe\`, follow suit)
+
+**Setup/Teardown**
+- Follow existing fixture and factory patterns
+- Reuse existing test utilities and helpers where available
+- Create new shared utilities only if there's a clear pattern for it
+
+### Step 5: Validate
+
+After all batches are complete:
+- Run the full test suite to ensure nothing is broken
+- Report results: total tests added, pass/fail, coverage delta if measurable
+- Flag any tests that are flaky or environment-dependent
+
+## Guardrails
+
+- **Do not refactor existing tests.** This skill adds new tests only. Do not modify, rename, or reorganize existing test files.
+- **Do not invent new patterns.** If the codebase uses factories, use factories. If it uses inline data, use inline data. Mirror, don't innovate.
+- **Do not exceed the plan.** Only implement tests that appear in the approved \`plan.md\`. If you identify additional test cases during implementation, note them but do not implement without approval.
+- **Do not skip the human checkpoint.** Pause between batches. The engineer must review before the next batch.`
+  },
+  {
+    name: "playwright-testing",
+    title: "Playwright Testing",
+    desc: "Generate E2E Playwright scripts with flakiness guardrails from acceptance criteria.",
+    content: `---
+name: playwright-testing
+description: Generate Playwright E2E test scripts from user story acceptance criteria and existing test patterns. Covers test planning, script generation, and reporting. Use for end-to-end testing of web applications.
+---
+
+# Playwright Testing
+
+Generate Playwright E2E test scripts from user story acceptance criteria, prototype screenshots, and existing test patterns.
+
+## Prerequisites
+
+Before running, verify the following:
+
+1. **Playwright installed** — Required. Check for \`playwright\` in \`package.json\` or equivalent. If not found, stop and tell the user:
+   > "Playwright is not installed in this project. Run \`npm init playwright@latest\` or add it to your project before using this skill."
+2. **Repository context** — Required. This skill must be run from within the repository where E2E tests will live.
+3. **Jira MCP** — Optional but recommended for pulling acceptance criteria automatically. If not connected, inform the user:
+   > "Jira MCP is not connected. You can provide story content directly, but automatic AC fetching is unavailable."
+
+## Inputs
+
+The user provides one of:
+- A Jira story key (skill fetches AC via MCP)
+- A story Markdown file (from \`/pull-stories\`)
+- Acceptance criteria pasted directly
+
+Optionally:
+- Prototype screenshots for visual reference
+- Specific pages or flows to focus on
+
+## Workflow
+
+### Step 1: Derive Conventions from Existing Tests
+
+Scan existing Playwright tests in the repository to infer:
+- **Test structure** — How are tests organized? By feature, by page, by flow?
+- **Page Object Model** — Does the project use POM? What's the pattern?
+- **Selectors** — \`data-testid\`, \`role\`, \`text\`, CSS selectors? What's preferred?
+- **Auth patterns** — How do existing tests handle login? Global setup, storage state, per-test?
+- **Base URL** — What's configured in \`playwright.config.ts\`?
+- **Assertion patterns** — \`expect(page).toHaveURL()\`, \`expect(locator).toBeVisible()\`, etc.
+- **Fixture patterns** — Custom fixtures, test data setup/teardown
+- **Browser configuration** — Which browsers are tested? Headed/headless?
+
+Do NOT hardcode or assume any of these. The existing test suite is the source of truth.
+
+### Step 2: Generate Test Scenarios
+
+From the acceptance criteria, generate test scenarios following this coverage strategy:
+
+**Acceptance Criteria Coverage**
+- Every AC item maps to at least one E2E test
+- Each test verifies the user-facing behavior described in the AC
+
+**Happy Path Tests**
+- Complete user flows from start to finish
+- Verify expected UI state at each step
+
+**Top 3 Error Paths**
+- Identify the three most likely failure scenarios for this feature
+- Generate tests that verify graceful error handling and user-facing error messages
+
+**Regression Tests**
+- If this story fixes a bug, generate a regression test that reproduces the original bug scenario and verifies the fix
+
+### Step 3: Plan Before Generating
+
+Output a brief test plan before writing any code:
+
+\`\`\`markdown
+# E2E Test Plan: [STORY-KEY]
+
+## Detected Conventions
+- Structure: [e.g., tests/e2e/features/]
+- Page Objects: [yes/no, pattern]
+- Selectors: [e.g., data-testid preferred]
+- Auth: [e.g., global setup with storageState]
+
+## Planned Tests
+| # | Type | Scenario | AC Reference |
+|---|------|---------|-------------|
+| 1 | Happy path | [Description] | AC-1 |
+| 2 | Happy path | [Description] | AC-2 |
+| 3 | Error path | [Description] | — |
+| 4 | Regression | [Description] | Bug fix |
+\`\`\`
+
+Wait for the engineer to review before generating scripts.
+
+### Step 4: Generate Playwright Scripts
+
+After plan approval, generate test scripts:
+
+- Follow the project's existing file and naming conventions
+- Use the detected Page Object Model pattern (or create page objects if that's the convention)
+- Use the project's preferred selector strategy
+- Add explicit waits and assertions — do not rely on implicit timeouts
+- Include meaningful test descriptions that reference the AC
+
+**Flakiness Guardrails**
+- Prefer \`data-testid\` or \`role\` selectors over CSS classes or DOM structure
+- Use \`await expect(locator).toBeVisible()\` before interacting with elements
+- Add \`await page.waitForLoadState('networkidle')\` or equivalent where page transitions occur
+- Avoid hardcoded timeouts (\`page.waitForTimeout()\`) — use condition-based waits instead
+- For animations or transitions, wait for the final state, not a fixed duration
+
+### Step 5: Run and Report
+
+After generating scripts:
+1. Run the tests against the staging environment (or local dev if staging is unavailable)
+2. Generate a Markdown report:
+
+\`\`\`markdown
+# E2E Test Report: [STORY-KEY]
+
+## Results
+| Test | Status | Duration |
+|------|--------|----------|
+| [Test name] | Pass/Fail | [time] |
+
+## Failures
+[For each failure: description, screenshot reference, likely cause]
+
+## Flakiness Assessment
+[Flag any tests that passed inconsistently across runs]
+\`\`\`
+
+### Step 6: Human Review
+
+Present the generated tests and report for review. Key questions:
+- Are selectors stable and maintainable?
+- Do tests cover the right user flows?
+- Are there timing-dependent tests that may be flaky?
+- Should any tests be marked as \`test.slow()\` or \`test.fixme()\`?`
+  },
+  {
+    name: "generate-pr",
+    title: "Generate PR",
+    desc: "Generate PR descriptions from commit history, diffs, and Jira context.",
+    content: `---
+name: generate-pr
+description: Generate a pull request description from commit history and file changes using the team's PR template. Use after completing work on a story and before opening a PR.
+---
+
+# Generate PR
+
+Generate a pull request description from the current branch's commit history and file changes, using the team's PR template.
+
+## Prerequisites
+
+Before running, verify the following:
+
+1. **Git repository** — Required. This skill must be run from within a git repository with commits on the current branch. If not in a git repo, stop and tell the user:
+   > "Not in a git repository. Navigate to your project repository before using this skill."
+2. **Jira MCP** — Optional. Used to pull story context for the PR description. If not connected, inform the user:
+   > "Jira MCP is not connected. You can provide story context manually, or the PR description will be generated from commits and code changes only."
+
+## Inputs
+
+The user optionally provides:
+- A Jira story key (for linking and context)
+- The target branch for comparison (default: \`main\`)
+- Any additional context about the changes
+
+## PR Template
+
+Use the following template structure. If the team has a \`.github/PULL_REQUEST_TEMPLATE.md\` in the repository, use that template instead and adapt this workflow to fill it.
+
+\`\`\`markdown
+## Summary
+
+[Brief description of what this PR does and why]
+
+## Story Reference
+
+[STORY-KEY]: [Story title and link]
+
+## Changes
+
+[Categorized list of changes, derived from commits and file diff]
+
+### Added
+- [New files or features]
+
+### Changed
+- [Modified behavior or refactored code]
+
+### Removed
+- [Deleted files or deprecated functionality]
+
+## Testing
+
+[Summary of test coverage for these changes]
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] E2E tests added/updated (if applicable)
+- [ ] Manual testing performed
+
+## Checklist
+
+- [ ] PRD and prototype are linked
+- [ ] All acceptance criteria have corresponding tests
+- [ ] Architecture diagrams reflect the implemented state (if applicable)
+- [ ] API contracts are published (if applicable)
+- [ ] No unrelated changes included
+
+## Notes for Reviewers
+
+[Anything reviewers should pay attention to — complex logic, tradeoffs, areas of uncertainty]
+\`\`\`
+
+## Workflow
+
+### Step 1: Gather Context
+
+**From Git:**
+- Run \`git log main..HEAD --oneline\` (or user-specified target branch) to get commit history
+- Run \`git diff main..HEAD --stat\` to get file change summary
+- Run \`git diff main..HEAD\` to get the full diff for understanding changes
+
+**From Jira (if MCP available and story key provided):**
+- Fetch story summary, description, and acceptance criteria
+- Fetch epic context for broader framing
+
+**From the Codebase:**
+- Check for \`.github/PULL_REQUEST_TEMPLATE.md\` — use it if it exists
+- Check for test files in the diff to summarize test coverage
+
+### Step 2: Analyze Changes
+
+Categorize the changes:
+- **What was added** — new files, new endpoints, new components
+- **What was changed** — modified behavior, refactored code, updated configs
+- **What was removed** — deleted files, removed features, deprecated code
+- **Test changes** — new tests, updated tests, test infrastructure changes
+
+Identify:
+- The primary purpose of the PR (feature, bugfix, refactor, chore)
+- Key files a reviewer should focus on
+- Any risky or complex changes that warrant extra attention
+
+### Step 3: Generate the PR Description
+
+Fill in the template with:
+- A clear summary that explains the "what" and "why"
+- Story reference linked to Jira (if available)
+- Categorized change list derived from the actual diff
+- Testing summary based on test files in the diff
+- Reviewer notes highlighting areas of complexity or risk
+
+### Step 4: Output
+
+Present the generated PR description to the engineer for review. Output as:
+- Markdown text ready to paste into a PR
+- If a story key was provided, include a Jira link in the story reference
+
+Do not automatically create the PR or push anything. The engineer copies the description into their PR tool.
+
+## Guardrails
+
+- **Do not fabricate changes.** Every item in the Changes section must correspond to actual commits or file changes in the diff.
+- **Do not assume test coverage.** Only reference tests that exist in the diff or are verifiably present in the codebase.
+- **Do not include unrelated context.** If the diff contains unrelated changes, flag them in the reviewer notes rather than normalizing them in the summary.`
+  }
+];
+
+// ─── Render Tabs ───
+const tabBar = document.getElementById('tabBar');
+const tabContents = document.getElementById('tabContents');
+
+skills.forEach((skill, i) => {
+  // Tab button
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn';
+  btn.textContent = skill.name;
+  btn.onclick = () => switchTab(i, true);
+  tabBar.appendChild(btn);
+
+  // Tab content
+  const content = document.createElement('div');
+  content.className = 'tab-content';
+  content.id = `tab-${i}`;
+  content.innerHTML = `
+    <div class="skill-header">
+      <div class="skill-meta">
+        <h3>/${skill.name}</h3>
+        <p>${skill.desc}</p>
+      </div>
+      <button class="copy-btn" onclick="copySkill(${i}, this)">Copy SKILL.md</button>
+    </div>
+    <div class="skill-code-wrap">
+      <pre class="skill-code"></pre>
+    </div>
+  `;
+  tabContents.appendChild(content);
+  content.querySelector('.skill-code').textContent = skill.content;
+});
+
+function switchTab(index, updateHash) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === index));
+  document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === index));
+  if (updateHash) {
+    history.replaceState(null, '', `#${skills[index].name}`);
+  }
+}
+
+// On load: check hash for deep link, default to first tab
+function initFromHash() {
+  const hash = location.hash.replace('#', '');
+  const index = skills.findIndex(s => s.name === hash);
+  switchTab(index >= 0 ? index : 0, false);
+}
+
+initFromHash();
+window.addEventListener('hashchange', initFromHash);
+
+function copySkill(index, btn) {
+  navigator.clipboard.writeText(skills[index].content).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy SKILL.md';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function copyPrompt(btn) {
+  const text = btn.parentElement.querySelector('pre').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
