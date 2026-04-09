@@ -460,7 +460,7 @@
       <span class="header-badge">AI-PDLC T2</span>
       <h1>Example Skills Reference</h1>
     </div>
-    <p class="header-sub">Seven example SKILL.md files for the AI Product Development Lifecycle. Works with Cursor, Claude Code, and Gemini. Use these as-is or as examples to create your own versions of skills. See below for how to add them to your system.</p>
+    <p class="header-sub">Five example SKILL.md files for the AI Product Development Lifecycle. Works with Cursor, Claude Code, and Gemini. Use these as-is or as examples to create your own versions of skills. See below for how to add them to your system.</p>
   </div>
 </header>
 
@@ -601,52 +601,252 @@
 <script>
 const skills = [
   {
-    name: "pull-stories",
-    title: "Pull Stories",
-    desc: "Fetch stories from Jira MCP and convert to Markdown for LLM context.",
+    name: "create-epic-stories",
+    title: "Create Epic & Stories",
+    desc: "Generate a structured epic and user stories markdown file from a PRD and supporting documents.",
     content: `---
-name: pull-stories
-description: Pull user stories from Jira and convert them to Markdown for LLM context. Use when beginning backlog refinement or sprint planning and you need story content locally.
+name: create-epic-stories
+description: Generate a structured epic and user stories markdown file from a PRD and supporting documents. Use when breaking down a PRD into Jira-ready epics and stories.
 ---
 
-# Pull Stories
+# Create Epic & Stories
 
-Pull user stories from Jira and convert them to Markdown files for LLM context.
+Generate a structured markdown file containing an epic and its user stories from a PRD and supporting documents. This skill produces a reviewable document — it does not push to Jira.
 
-## Prerequisites
+## Inputs
 
-Before running, verify the following tools are available:
+### Required
+- **Product Requirements Document (PRD)** — the primary source of truth for scope, goals, and requirements.
 
-1. **Jira MCP** — Required. If not connected, stop and tell the user:
-   > "Jira MCP is not configured. Set up the Jira MCP server before using this skill. See: https://github.com/atlassian/mcp-server-atlassian"
+### Supporting Documents (at least one required)
+The user must provide at least one of the following. If none are provided, stop and ask:
+
+> "I need at least one supporting document alongside the PRD. Please provide one or more of:
+> - Prototype screenshots (up to two)
+> - User insight report
+> - Feature-level journey map
+> - System architecture context (for brownfield features)"
+
+- **Prototype screenshots** (up to two) — UI references for acceptance criteria and interaction details.
+- **User insight report** — research findings, user pain points, and behavioral context that inform story priority and acceptance criteria.
+- **Feature-level journey map** — end-to-end user flow that identifies story boundaries, handoff points, and sequencing.
+- **System architecture context** — existing system constraints, integration points, and technical dependencies for brownfield features.
 
 ## Workflow
 
-### Step 1: Identify Stories to Pull
+### Step 1: Analyze the PRD
 
-Ask the user for one of:
-- A Jira sprint name or ID
-- A Jira epic key (e.g., \`PROJ-123\`)
-- A JQL query (e.g., \`project = PROJ AND sprint in openSprints()\`)
-- A list of specific story keys
+Extract from the PRD:
+- Feature objectives and success criteria
+- Functional requirements
+- Non-functional requirements (performance, security, accessibility)
+- Out-of-scope items
+- Dependencies on other teams or systems
 
-### Step 2: Fetch Stories from Jira
+### Step 2: Cross-reference Supporting Documents
 
-Use the Jira MCP to fetch the stories. For each story, retrieve:
+For each supporting document provided:
+
+- **Prototype screenshots** — identify UI elements, interactions, and states that need story-level coverage. Flag any behaviors visible in the prototype that are not described in the PRD.
+- **User insight report** — map user pain points and needs to specific stories. Use insights to inform acceptance criteria language and priority.
+- **Feature-level journey map** — use the flow to identify natural story boundaries. Each distinct step or decision point in the journey is a candidate for a story or set of stories.
+- **System architecture context** — identify integration stories, migration stories, and technical constraints that affect acceptance criteria. Flag where existing system behavior must be preserved.
+
+Note any contradictions or gaps between the PRD and supporting documents. Include these in the output as open questions.
+
+### Step 3: Define the Epic
+
+Write the epic with:
+- **Title** — concise name for the feature or capability
+- **Summary** — 2-3 sentence description of what this epic delivers and why
+- **Goals** — measurable outcomes tied to the PRD's success criteria
+- **Out of scope** — explicitly carried over from the PRD
+- **Dependencies** — external teams, services, or features this epic depends on
+
+### Step 4: Break Down into User Stories
+
+For each story:
+- **Title** — concise, written as "As a [user], I want [action] so that [outcome]" or a clear summary
+- **Description** — what this story delivers, with enough context for an engineer unfamiliar with the epic
+- **Acceptance criteria** — written as testable conditions, not implementation instructions. Informed by prototype screenshots and user insights where available.
+- **Story points estimate** — a rough sizing suggestion (S/M/L or numeric) based on apparent complexity
+- **Dependencies** — other stories in this epic or external dependencies
+- **Priority** — High / Medium / Low, informed by user insight report and journey map position
+- **Notes** — any open questions, contradictions found, or assumptions made
+
+### Story Breakdown Guidelines
+
+- Stories should be independently deliverable where possible
+- Avoid stories that are purely technical with no user-facing behavior unless they are explicit enablers (e.g., database migration, API scaffolding)
+- Integration points identified from architecture context should be their own stories
+- If a story is too large to complete in a single sprint, flag it for splitting
+
+### Step 5: Write the Output File
+
+Save to \`epic.md\` in the working directory:
+
+\\\`\\\`\\\`markdown
+# Epic: [Title]
+
+## Summary
+[2-3 sentence description]
+
+## Goals
+- [Goal 1 — tied to PRD success criteria]
+- [Goal 2]
+
+## Out of Scope
+- [Item 1]
+- [Item 2]
+
+## Dependencies
+- [Dependency 1]
+
+## Source Documents
+- PRD: [name/reference]
+- [Supporting doc type]: [name/reference]
+
+---
+
+## Stories
+
+### [STORY-1]: [Title]
+
+**Description**
+[What this story delivers]
+
+**Acceptance Criteria**
+- [ ] [Testable condition]
+- [ ] [Testable condition]
+
+**Size:** [S/M/L] | **Priority:** [High/Medium/Low]
+**Dependencies:** [Other stories or external]
+**Notes:** [Open questions, assumptions, or contradictions]
+
+---
+
+### [STORY-2]: [Title]
+[Repeat structure]
+
+---
+
+## Open Questions
+- [Contradiction or gap found between PRD and supporting documents]
+- [Assumption that needs stakeholder confirmation]
+\\\`\\\`\\\`
+
+### Step 6: Stop for Human Review
+
+**Do not push to Jira or take any further action.** Present the \`epic.md\` file to the user and ask:
+- Are any stories missing?
+- Should any stories be split or merged?
+- Are the priorities and sizing reasonable?
+- Do the open questions need resolution before stories are created in Jira?
+
+The user or a separate agent can push the approved epic and stories to Jira via MCP at a later time.`
+  },
+  {
+    name: "jira-mcp-pull-stories",
+    title: "Pull Stories",
+    desc: "Exports Jira issues to Markdown for LLM context via Jira MCP. Includes scope gate to prevent unscoped queries.",
+    content: `---
+name: jira-mcp-pull-stories
+description: >-
+  Exports Jira issues to Markdown for LLM context via Jira MCP (Atlassian).
+  Use when pulling user stories, backlog or sprint issues, or exporting Jira
+  scope locally. HARD REQUIREMENT — do not call any Jira or Atlassian tools
+  until the user has explicitly provided scope (sprint, epic, JQL, or issue
+  keys); if scope is missing, stop and ask using the prompt in "Scope gate"
+  below.
+---
+
+# Jira MCP — Pull Stories
+
+This skill exports Jira issues to Markdown files in a \`stories/\` folder using **Jira MCP** (e.g. Atlassian MCP in Cursor).
+
+## Prerequisites
+
+1. **Jira MCP** — Required. If not available, stop and tell the user:
+   > "Jira MCP is not configured. Set up the Jira MCP server before using this skill. See: https://github.com/atlassian/mcp-server-atlassian"
+
+---
+
+## Scope gate (mandatory — read before any Jira call)
+
+**Do not** call \`getAccessibleAtlassianResources\`, search/fetch Jira APIs, or **any** Jira-related MCP tool until **all** of the following are true:
+
+1. The user has been asked (in this conversation) which scope they want.
+2. The user has replied with **exactly one** of the following (or you have their explicit approval to use a scope they already stated earlier in the same thread):
+   - A Jira **sprint name or sprint ID**
+   - A Jira **epic key** (e.g. \`PROJ-123\`)
+   - A **JQL query** they approve (e.g. \`project = PROJ AND sprint in openSprints()\`)
+   - A **list of specific story/issue keys** (see **Single key vs epic** below)
+
+**Forbidden without user scope:** Picking a default project, inventing JQL, using \`ORDER BY updated DESC\`, "recent stories", or any exploratory query "just to test" — unless the user explicitly asked for that query.
+
+### Single key vs epic (disambiguation)
+
+A **single** key like \`PROJ-123\` matches **two** scope types (epic key *or* one explicit issue). **Do not** assume the user wants only that one issue, or assume they mean the whole epic, until intent is clear.
+
+**Before any Jira call**, if the user provided **exactly one** key and did **not** already disambiguate, **ask once**:
+
+> For \`PROJ-123\`, should I pull **only that issue**, or **all issues under that epic**?
+
+Treat any of the following as sufficient disambiguation (no extra question): wording like **"epic PROJ-123"**, **"everything under the epic"**, **"children of PROJ-123"**, **"just PROJ-123"**, **"only that ticket"**, or **comma-separated keys** (two or more), or **JQL/sprint** scope.
+
+If scope is missing, **stop** and ask the user this (verbatim is fine):
+
+> Which stories should I pull? Send **one** of:
+> - Sprint name or sprint ID  
+> - **Epic key** (e.g. \`PROJ-123\`) — *I will pull **all issues under that epic***  
+> - JQL you want executed (paste the full query)  
+> - Comma-separated issue keys — *I will pull **exactly those issues*** (e.g. \`PROJ-101, PROJ-102\`)  
+> - **Single issue key** — *say if you want **only that issue** or **all issues under that epic*** (same key)
+
+Wait for their answer. Only then proceed (running **Single key vs epic** if still needed).
+
+---
+
+## JQL hints (after scope is set)
+
+- **Epic key:** Team-managed/next-gen often uses \`parent = EPIC-KEY\`. Company-managed often uses \`"Epic Link" = EPIC-KEY\`. If one form returns no rows, try the other (or ask the user).
+- **Sprint:** Resolve sprint name to JQL with the user if multiple sprints match.
+
+---
+
+## Workflow
+
+### Step 1: Map scope to JQL
+
+Scope is defined in **Scope gate** above. Translate sprint name or epic key into JQL as needed; **confirm with the user** if the mapping is ambiguous.
+
+### Step 2: Fetch issues from Jira MCP
+
+**Before calling any Jira MCP tool:** Read that server's tool descriptors (parameter names and required fields). In Cursor, these are usually under the workspace \`mcps/<server>/tools/\` folder for the Atlassian/Jira MCP — use the actual tool names and arguments from the schema, not guesses.
+
+Use the connected Jira MCP to load each issue. Resolve **cloud/site id** if the tool requires it (e.g. via accessible Atlassian resources).
+
+- **Zero results:** If search/JQL returns no issues, report that explicitly — do not invent keys or broaden the query without user approval.
+- **Auth or permission errors:** Stop and surface the error message to the user; do not retry with different scope unless they ask.
+
+For each issue, retrieve:
+
 - Summary (title)
 - Description
-- Acceptance criteria
-- Story points
+- Acceptance criteria (custom field or text in description — preserve meaning)
+- Story points (if present on the issue type)
 - Labels and components
-- Linked issues (blockers, dependencies)
-- Epic link
+- Linked issues (use each link's **inward/outward** label from Jira)
+- Epic/parent link
 - Subtasks
-- Comments (latest 5, if any contain requirements context)
-- Attachments list (names only — flag for manual review)
+- Comments: **latest five (newest first)**; summarize in Notes only when they add requirements not already in the description
+- Attachments: names only — flag for manual review
+
+*(In Cursor's Atlassian MCP, search and issue fetch are commonly exposed as tools such as \`searchJiraIssuesUsingJql\` and \`getJiraIssue\`; tool names may differ in other MCP servers — use whatever implements the same operations.)*
 
 ### Step 3: Convert to Markdown
 
-For each story, generate a Markdown file using this structure:
+For each issue, generate a Markdown file using this structure:
 
 \`\`\`markdown
 # [STORY-KEY]: [Summary]
@@ -661,293 +861,53 @@ For each story, generate a Markdown file using this structure:
 
 ## Acceptance Criteria
 
-[Acceptance criteria — convert to checkbox list if not already]
+[Convert to checkbox list; if only embedded in description, extract or note "see Description"]
 
 - [ ] Criteria 1
 - [ ] Criteria 2
 
+## Subtasks
+
+[List subtask keys and summaries, or "—" if none]
+
 ## Dependencies
 
-[List linked blockers and dependencies with their status]
+[For each issue link, use Jira's link type wording and direction]
 
-- **Blocked by:** PROJ-456 (In Progress) — [Summary]
-- **Relates to:** PROJ-789 (Done) — [Summary]
+- **[Inward or outward link label]:** OTHER-KEY (Status) — Summary
 
 ## Notes
 
-[Relevant comments summarized, if any]
+[Summaries from latest comments when they add new requirements context]
 
 ## Attachments
 
-[List attachment filenames — flag for manual review]
+[List filenames — flag for manual review]
 \`\`\`
 
-### Step 4: Save Files
+### Step 4: Save files
 
-Save all Markdown files to a \`stories/\` directory in the current working directory:
-- Filename format: \`[STORY-KEY].md\` (e.g., \`PROJ-101.md\`)
-- Create a \`stories/index.md\` that lists all pulled stories with their key, title, status, and points
+Save all Markdown files under a \`stories/\` directory in the **current working directory**:
+
+- Filename: \`[STORY-KEY].md\` (e.g. \`PROJ-101.md\`)
+- Create \`stories/index.md\` listing key, title, status, and points for each pulled issue — sort rows by issue key (ascending) for stable output
 
 ### Step 5: Summary
 
-After pulling, output:
-- Total stories pulled
-- Stories with missing acceptance criteria (flag these)
-- Stories with unresolved blockers
-- Stories with attachments that may need manual review`
-  },
-  {
-    name: "plan-story",
-    title: "Plan Story",
-    desc: "Refine a single story — identify gaps, edge cases, and split recommendations.",
-    content: `---
-name: plan-story
-description: Refine a single user story by identifying missing requirements, edge cases, and whether it should be split. Use during backlog refinement to ensure stories are fully refined before entering a sprint.
----
-
-# Plan Story
-
-Refine a single user story for sprint readiness. Identify gaps, missing requirements, edge cases, and determine if the story should be split.
-
-## Prerequisites
-
-Before running, verify the following tools are available:
-
-1. **Jira MCP** — Required for pushing changes back. If not connected, stop and tell the user:
-   > "Jira MCP is not configured. Set up the Jira MCP server before using this skill. See: https://github.com/atlassian/mcp-server-atlassian"
-2. **Repository context** — This skill must be run from within the repository where the work will take place. The codebase is essential context for identifying implementation concerns.
-
-## Inputs
-
-The user provides one of:
-- A story Markdown file (from \`/pull-stories\`)
-- A Jira story key (skill will fetch via MCP)
-- Story content pasted directly
-
-## Workflow
-
-### Step 1: Understand the Story
-
-Read the story in full. Then scan the repository to understand:
-- What area of the codebase this story affects
-- Existing patterns, interfaces, and abstractions in that area
-- Related test coverage
-- Recent changes in the affected files (use git log if available)
-
-### Step 2: Identify Missing Requirements
-
-Evaluate the story against these dimensions:
-
-**Completeness**
-- Are acceptance criteria specific and testable?
-- Are input/output expectations defined?
-- Are error states and edge cases covered?
-- Are there implicit requirements not written down?
-
-**Technical Feasibility**
-- Does the story align with existing architecture?
-- Are there hidden dependencies on other stories or services?
-- Does it require changes to shared interfaces or data models?
-- Are there performance implications?
-
-**Scope**
-- Is this story small enough for a single sprint?
-- Does it mix unrelated concerns (e.g., UI + API + data migration)?
-- Should it be split into multiple stories? If so, propose the split with clear boundaries.
-
-**Edge Cases**
-Ask: *"What edge cases are not covered in this story?"*
-Consider: null/empty inputs, concurrent access, partial failures, authorization boundaries, backward compatibility, data migration paths.
-
-### Step 3: Generate Refinement Report
-
-Output a structured report:
-
-\`\`\`markdown
-# Refinement Report: [STORY-KEY]
-
-## Summary
-[One-line assessment: Ready / Needs Work / Should Split]
-
-## Missing Requirements
-- [Requirement 1 — why it's needed]
-- [Requirement 2 — why it's needed]
-
-## Edge Cases Not Covered
-- [Edge case 1]
-- [Edge case 2]
-
-## Dependencies Identified
-- [Dependency 1 — status and risk]
-
-## Recommended Acceptance Criteria Additions
-- [ ] [New AC 1]
-- [ ] [New AC 2]
-
-## Split Recommendation
-[If applicable: proposed story breakdown with scope for each]
-
-## Questions for Product
-[Any ambiguities that require product input]
-\`\`\`
-
-### Step 4: Human Review
-
-Present the refinement report for engineer review. Do not push any changes to Jira until the engineer confirms.
-
-### Step 5: Push to Jira
-
-After confirmation, use the Jira MCP to:
-- Update acceptance criteria
-- Add new edge case notes to the description
-- Create new stories if a split was approved
-- Link split stories to the original
-- Add a comment summarizing the refinement`
-  },
-  {
-    name: "plan-story-implementation",
-    title: "Plan Story Implementation",
-    desc: "Generate sprint implementation plan with critical path, dependencies, and file changes.",
-    content: `---
-name: plan-story-implementation
-description: Generate a structured implementation plan for sprint stories. Identifies critical path, blocking dependencies, file changes, and sequencing. Use during sprint planning after stories are refined.
----
-
-# Plan Story Implementation
-
-Generate a structured implementation plan for one or more sprint stories. Identifies critical path, dependencies, file changes, and sequencing.
-
-## Prerequisites
-
-Before running, verify the following tools are available:
-
-1. **Jira MCP** — Optional but recommended. Used to fetch stories and push plan updates. If not connected, inform the user:
-   > "Jira MCP is not connected. You can still use this skill with local Markdown story files, but automatic Jira sync is unavailable."
-2. **Repository context** — Required. This skill must be run from within the repository where the work will take place.
-
-## Inputs
-
-The user provides one of:
-- A sprint name or ID (fetched via Jira MCP)
-- A set of story Markdown files (from \`/pull-stories\`)
-- A list of Jira story keys
-
-## Workflow
-
-### Step 1: Load Stories
-
-Load all stories for the sprint. For each story, gather:
-- Summary, description, acceptance criteria
-- Dependencies and blockers
-- Story points
-
-### Step 2: Scan the Codebase
-
-For each story, identify:
-- **Affected files** — Which files will need to be created or modified?
-- **Existing patterns** — What conventions exist in the affected area? (naming, structure, error handling, logging)
-- **Shared interfaces** — Does this touch shared code that other stories also depend on?
-- **Test coverage** — What tests exist for the affected area?
-
-### Step 3: Generate the Implementation Plan
-
-Produce a plan covering the following for each story:
-
-**Implementation Steps**
-- Back-end changes (services, APIs, data access)
-- Front-end changes (components, state, routing)
-- Tests (unit, integration — reference the test planning skill for details)
-
-**File Changes**
-- Files to modify (with brief description of change)
-- Files to create
-- Files that may be affected indirectly (shared utilities, types, configs)
-
-**Validation Steps**
-- How to verify the implementation works
-- Manual testing steps if applicable
-- Automated test expectations
-
-### Step 4: Identify Critical Path and Dependencies
-
-Across all stories in the sprint:
-- Map inter-story dependencies (which stories block others)
-- Identify the critical path (longest dependency chain)
-- Flag parallel work opportunities (stories with no shared dependencies)
-- Recommend implementation order
-
-### Step 5: Output the Plan
-
-Save the plan as a Markdown file: \`plan.md\` in the working directory.
-
-\`\`\`markdown
-# Sprint Implementation Plan: [Sprint Name]
-
-## Critical Path
-[Ordered list of stories on the critical path]
-
-## Parallel Tracks
-[Groups of stories that can be worked simultaneously]
-
-## Story Plans
-
-### [STORY-KEY]: [Summary]
-
-**Implementation Steps**
-1. [Step with file and description]
-2. [Step with file and description]
-
-**Files to Change**
-- \`src/api/handler.ts\` — Add new endpoint
-- \`src/services/processor.ts\` — Extend processing logic
-
-**Files to Create**
-- \`src/api/validators/newValidator.ts\`
-- \`src/tests/handler.test.ts\`
-
-**Validation**
-- [ ] Unit tests pass
-- [ ] Integration test covers AC #1 and #2
-- [ ] Manual verification of [scenario]
-
-**Dependencies**
-- Blocked by: [STORY-KEY] (shared interface change)
-- Blocks: [STORY-KEY]
-
----
-[Repeat for each story]
-\`\`\`
-
-### Step 6: Human Review
-
-Present the plan to the tech lead and team. Do not proceed to implementation until the plan is reviewed.
-
-### Step 7: Push Updates (Optional)
-
-If Jira MCP is connected and the user confirms:
-- Attach \`plan.md\` to the sprint epic or a designated Jira ticket
-- Update story descriptions with implementation notes
-- Adjust story sequencing based on critical path findings
-
-## Scope Guardrails
-
-A plan generated by this skill should cover:
-- Implementation steps (back-end, front-end, tests)
-- Necessary file changes
-- Validation steps
-
-A plan should **NOT** include:
-- Release notes
-- Deployment pipelines
-- Architecture refactoring (those are epic-level concerns)`
+After pulling, report:
+
+- Total issues pulled
+- Issues with missing or unclear acceptance criteria (flag these)
+- Issues with unresolved blockers (from links)
+- Issues with attachments that may need manual review`
   },
   {
     name: "plan-tests",
     title: "Plan Tests",
-    desc: "Generate a structured test plan by scanning codebase conventions and pulling AC from Jira.",
+    desc: "Generate a structured test plan for a user story. Outputs plan.md for human review before any code is written.",
     content: `---
 name: plan-tests
-description: Generate a structured test plan for a user story by scanning the codebase for conventions, pulling business context from Jira, identifying coverage gaps, and producing edge case and performance test recommendations. Use before writing any test code.
+description: Guidelines for planning unit and integration tests for a user story.
 ---
 
 # Plan Tests
@@ -956,30 +916,20 @@ Generate a structured test plan for a user story. This skill plans tests — it 
 
 ## Prerequisites
 
-Before running, verify the following tools are available:
-
-1. **Jira MCP** — Required for pulling story context. If not connected, stop and tell the user:
-   > "Jira MCP is not configured. Set up the Jira MCP server before using this skill. See: https://github.com/atlassian/mcp-server-atlassian"
-   >
-   > You can still use this skill by providing story content directly, but automatic context gathering will be unavailable.
-2. **Repository context** — Required. This skill must be run from within the repository where the code under test lives.
+**Repository context** — Required. This skill must be run from within the repository where the code under test lives.
 
 ## Inputs
 
-The user provides one of:
-- A Jira story key (skill fetches via MCP)
-- A story Markdown file (from \`/pull-stories\`)
-- Story content pasted directly
-
-Optionally:
-- Specific files or modules to focus on
-- An existing implementation plan (\`plan.md\` from \`/plan-story-implementation\`)
+The user provides:
+- A story Markdown file or story content pasted directly
+- Optionally: specific files or modules to focus on
 
 ## Workflow
 
 ### Step 1: Derive Conventions from the Codebase
 
-Scan existing test files in the repository to infer:
+Scan existing test files in the repository to infer — do NOT hardcode or assume any of these:
+
 - **Test framework** — Jest, Vitest, JUnit 5, pytest, Mocha, etc.
 - **Naming patterns** — \`*.test.ts\`, \`*.spec.ts\`, \`*Test.java\`, \`test_*.py\`, etc.
 - **File organization** — Co-located with source? Separate \`__tests__/\` or \`test/\` directory?
@@ -988,71 +938,48 @@ Scan existing test files in the repository to infer:
 - **Setup/teardown patterns** — \`beforeEach\`, \`@BeforeAll\`, fixtures, factories
 - **Test data patterns** — Factories, builders, fixtures, inline data
 
-Do NOT hardcode or assume any of these. The codebase is the source of truth.
+The codebase is the source of truth, not a static reference doc.
 
-### Step 2: Pull Business Context
+### Step 2: Identify Coverage Gaps
 
-If Jira MCP is available, fetch:
-- User story description
-- Acceptance criteria
-- Linked requirements or parent epic context
-- Comments that clarify requirements
+Review existing test files in the affected area. Focus the plan on gaps — do not re-cover what is already validated. This is a static scan of test files, not a runtime coverage report.
 
-This eliminates tests that verify code structure instead of intended behavior. Every test case should trace back to a business requirement or a realistic failure scenario.
+### Step 3: Determine Test Types
 
-### Step 3: Identify Test Boundaries
-
-Review existing test coverage in the affected area:
-- What is already tested?
-- What files or functions have zero coverage?
-- Are there tests that overlap or duplicate existing coverage?
-
-Focus the plan on gaps. Do not re-cover what is already validated.
+Identify the types of tests required to adequately cover the story: unit tests, integration tests, and the appropriate testing techniques (equivalence class partitioning, boundary value analysis, state transition testing, etc.).
 
 ### Step 4: Generate Test Scenarios
 
-For each testable aspect of the story, generate scenarios across these categories:
+For each testable aspect of the story, include scenarios across these categories:
 
 **Acceptance Criteria Tests**
 - One or more test cases per acceptance criterion
-- Each case should verify the intended behavior, not code structure
+- Each case verifies intended behavior, not code structure
 
 **Edge Cases**
-- Invalid input types
-- Empty, null, or undefined values
+- Invalid input types, empty/null/undefined values
 - Boundary values (min, max, zero, negative, overflow)
 - Unicode, special characters, extremely long strings
 - Concurrent access or race conditions (if applicable)
 
 **Error Handling**
-- Network failures, timeouts
-- Upstream service errors
-- Invalid state transitions
-- Authorization failures
+- Network failures, timeouts, upstream service errors
+- Invalid state transitions, authorization failures
 - Malformed data from external sources
 
 **Rainy-Day Scenarios**
 - Partial failures (some items succeed, some fail)
-- Retry behavior
-- Graceful degradation
+- Retry behavior, graceful degradation
 - Data consistency under failure
 
-### Step 5: Assess Performance Testing Needs
+**Performance** (only if the story involves SLAs, batch processing, or concurrency)
+- Specific metrics and thresholds to validate
 
-Evaluate whether the code under test warrants performance tests based on:
-- SLA requirements (response time, throughput)
-- Data volume (batch processing, large payloads)
-- API response time expectations
-- Resource-intensive operations (CPU, memory, I/O)
-- Concurrency requirements
-
-If performance tests are warranted, include them in the plan with specific metrics to validate.
-
-### Step 6: Output the Plan
+### Step 5: Write the Plan File
 
 Save to \`plan.md\` in the working directory:
 
-\`\`\`markdown
+\\\`\\\`\\\`markdown
 # Test Plan: [STORY-KEY] — [Summary]
 
 ## Detected Conventions
@@ -1067,19 +994,16 @@ Save to \`plan.md\` in the working directory:
 | # | AC Reference | Test Description | Priority |
 |---|-------------|-----------------|----------|
 | 1 | AC-1 | [Description] | High |
-| 2 | AC-2 | [Description] | High |
 
 ### Edge Cases
 | # | Scenario | Test Description | Priority |
 |---|---------|-----------------|----------|
 | 1 | Empty input | [Description] | Medium |
-| 2 | Null values | [Description] | Medium |
 
 ### Error Handling
 | # | Failure Mode | Test Description | Priority |
 |---|-------------|-----------------|----------|
 | 1 | Network timeout | [Description] | High |
-| 2 | Auth failure | [Description] | Medium |
 
 ### Performance (if applicable)
 | # | Metric | Target | Test Description |
@@ -1093,127 +1017,19 @@ Save to \`plan.md\` in the working directory:
 
 ## Coverage Gaps Identified
 - [Gap 1 — existing code with no test coverage]
-- [Gap 2]
 
 ## Out of Scope
 - [Tests explicitly excluded and why]
-\`\`\`
+\\\`\\\`\\\`
 
-### Step 7: Human Review
+### Step 6: Stop for Human Review
 
-This file is a human-in-the-loop checkpoint. The engineer reviews and adjusts the plan before any test code is generated. Present the plan and ask:
+**Do not proceed to test implementation.** Present the plan to the engineer and ask:
 - Are any test cases unnecessary?
 - Are there scenarios missing?
 - Should priorities be adjusted?
-- Are the performance test thresholds correct?`
-  },
-  {
-    name: "implement-tests",
-    title: "Implement Tests",
-    desc: "Implement tests in batches from an approved plan.md, following codebase conventions.",
-    content: `---
-name: implement-tests
-description: Implement test code from an approved test plan (plan.md). Generates tests incrementally in batches, following conventions detected by the test planner. Use after /plan-tests has been reviewed and approved.
----
 
-# Implement Tests
-
-Implement test code from an approved test plan. This skill consumes a \`plan.md\` generated by \`/plan-tests\` and writes tests incrementally, following the conventions and frameworks identified by the planner.
-
-## Prerequisites
-
-Before running, verify the following:
-
-1. **An approved test plan** — Required. Look for \`plan.md\` in the working directory. If not found, stop and tell the user:
-   > "No test plan found. Run \`/plan-tests\` first to generate a plan, review it, then invoke this skill."
-2. **Repository context** — Required. This skill must be run from within the repository where the tests will live.
-
-## Inputs
-
-- \`plan.md\` — The approved test plan (required)
-- Optionally: specific test categories to implement (e.g., "just the acceptance criteria tests" or "skip performance tests")
-
-## Workflow
-
-### Step 1: Read the Plan
-
-Parse \`plan.md\` to extract:
-- Detected conventions (framework, naming, mocking, assertions)
-- Test cases organized by category and priority
-- Dependencies and setup requirements
-- Performance test specifications (if any)
-
-### Step 2: Scan for Current Conventions
-
-Even though the plan includes detected conventions, re-scan the codebase to confirm:
-- The framework and patterns haven't changed since planning
-- New tests added since planning don't overlap with the plan
-- Import paths and module structure are current
-
-If conventions have shifted since the plan was written, inform the user and follow the current codebase conventions.
-
-### Step 3: Implement in Batches
-
-Generate tests incrementally, not all at once. Batch by category in this order:
-
-**Batch 1: Acceptance Criteria Tests (High Priority)**
-- Implement all AC tests first — these are the core business validation
-- After generating, pause for the engineer to review and run them
-
-**Batch 2: Error Handling Tests**
-- Implement error path and failure mode tests
-- After generating, pause for review
-
-**Batch 3: Edge Case Tests**
-- Implement edge case and boundary tests
-- After generating, pause for review
-
-**Batch 4: Performance Tests (if applicable)**
-- Implement any performance tests specified in the plan
-- After generating, pause for review
-
-For each batch:
-1. Write the test files following detected conventions
-2. Ensure imports, mocks, and setup match existing patterns
-3. Present the generated code to the engineer
-4. Wait for confirmation before proceeding to the next batch
-
-### Step 4: Follow Detected Standards
-
-For each test file generated:
-
-**Structure**
-- Place files according to the project's test organization (co-located, \`__tests__/\`, \`test/\`, etc.)
-- Name files according to detected naming patterns
-- Group related tests using the project's grouping convention (\`describe\`, \`@Nested\`, \`class\`, etc.)
-
-**Mocking**
-- Use the mocking strategy found in existing tests
-- Do not introduce new mocking libraries or patterns
-- Mirror the level of abstraction in existing mocks
-
-**Assertions**
-- Use the assertion style found in existing tests
-- Match specificity level (e.g., if existing tests use \`toEqual\` over \`toBe\`, follow suit)
-
-**Setup/Teardown**
-- Follow existing fixture and factory patterns
-- Reuse existing test utilities and helpers where available
-- Create new shared utilities only if there's a clear pattern for it
-
-### Step 5: Validate
-
-After all batches are complete:
-- Run the full test suite to ensure nothing is broken
-- Report results: total tests added, pass/fail, coverage delta if measurable
-- Flag any tests that are flaky or environment-dependent
-
-## Guardrails
-
-- **Do not refactor existing tests.** This skill adds new tests only. Do not modify, rename, or reorganize existing test files.
-- **Do not invent new patterns.** If the codebase uses factories, use factories. If it uses inline data, use inline data. Mirror, don't innovate.
-- **Do not exceed the plan.** Only implement tests that appear in the approved \`plan.md\`. If you identify additional test cases during implementation, note them but do not implement without approval.
-- **Do not skip the human checkpoint.** Pause between batches. The engineer must review before the next batch.`
+This is a mandatory checkpoint. No test code is generated until the engineer approves the plan.`
   },
   {
     name: "playwright-testing",
