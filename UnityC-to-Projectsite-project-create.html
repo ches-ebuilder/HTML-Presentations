@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC → ProjectSight Project Creation Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b22;
+    --surface-raised: #1c2129;
+    --border: rgba(255,255,255,0.06);
+    --border-hover: rgba(255,255,255,0.12);
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #484f58;
+
+    --blue: #58a6ff;
+    --blue-bg: rgba(88,166,255,0.08);
+    --blue-border: rgba(88,166,255,0.25);
+
+    --teal: #3fb9a0;
+    --teal-bg: rgba(63,185,160,0.08);
+    --teal-border: rgba(63,185,160,0.25);
+
+    --coral: #f0883e;
+    --coral-bg: rgba(240,136,62,0.08);
+    --coral-border: rgba(240,136,62,0.25);
+
+    --amber: #d29922;
+    --amber-bg: rgba(210,153,34,0.08);
+    --amber-border: rgba(210,153,34,0.25);
+
+    --purple: #bc8cff;
+    --purple-bg: rgba(188,140,255,0.08);
+    --purple-border: rgba(188,140,255,0.25);
+
+    --red: #f85149;
+    --red-bg: rgba(248,81,73,0.08);
+    --red-border: rgba(248,81,73,0.25);
+
+    --green: #56d364;
+    --green-bg: rgba(86,211,100,0.08);
+    --green-border: rgba(86,211,100,0.25);
+
+    --gray-bg: rgba(255,255,255,0.04);
+    --gray-border: rgba(255,255,255,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+
+  .page-header {
+    max-width: 880px;
+    margin: 0 auto 48px;
+  }
+
+  .page-header .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .page-header h1 span { color: var(--blue); }
+
+  .page-header p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 640px;
+  }
+
+  .legend {
+    max-width: 880px;
+    margin: 0 auto 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  .flow-container {
+    max-width: 880px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* The vertical spine */
+  .spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--border), var(--border-hover) 10%, var(--border-hover) 90%, transparent);
+    transform: translateX(-0.5px);
+    z-index: 0;
+  }
+
+  .flow-node {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    margin: 0 auto 0;
+    padding: 0;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .flow-node:nth-child(1) { animation-delay: 0.05s; }
+  .flow-node:nth-child(2) { animation-delay: 0.1s; }
+  .flow-node:nth-child(3) { animation-delay: 0.15s; }
+  .flow-node:nth-child(4) { animation-delay: 0.2s; }
+  .flow-node:nth-child(5) { animation-delay: 0.25s; }
+  .flow-node:nth-child(6) { animation-delay: 0.3s; }
+  .flow-node:nth-child(7) { animation-delay: 0.35s; }
+  .flow-node:nth-child(8) { animation-delay: 0.4s; }
+  .flow-node:nth-child(9) { animation-delay: 0.45s; }
+  .flow-node:nth-child(10) { animation-delay: 0.5s; }
+  .flow-node:nth-child(11) { animation-delay: 0.55s; }
+  .flow-node:nth-child(12) { animation-delay: 0.6s; }
+  .flow-node:nth-child(13) { animation-delay: 0.65s; }
+  .flow-node:nth-child(14) { animation-delay: 0.7s; }
+  .flow-node:nth-child(15) { animation-delay: 0.75s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .connector {
+    display: flex;
+    justify-content: center;
+    padding: 6px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .connector svg {
+    display: block;
+  }
+
+  .node-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+
+  .node-card:hover {
+    border-color: var(--border-hover);
+  }
+
+  .node-card .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .node-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .node-card .desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Color variants */
+  .node-card.blue { border-left: 3px solid var(--blue); }
+  .node-card.blue .step-num { color: var(--blue); }
+  .node-card.blue:hover { box-shadow: 0 0 20px var(--blue-bg); }
+
+  .node-card.teal { border-left: 3px solid var(--teal); }
+  .node-card.teal .step-num { color: var(--teal); }
+  .node-card.teal:hover { box-shadow: 0 0 20px var(--teal-bg); }
+
+  .node-card.coral { border-left: 3px solid var(--coral); }
+  .node-card.coral .step-num { color: var(--coral); }
+  .node-card.coral:hover { box-shadow: 0 0 20px var(--coral-bg); }
+
+  .node-card.purple { border-left: 3px solid var(--purple); }
+  .node-card.purple .step-num { color: var(--purple); }
+  .node-card.purple:hover { box-shadow: 0 0 20px var(--purple-bg); }
+
+  .node-card.green { border-left: 3px solid var(--green); }
+  .node-card.green .step-num { color: var(--green); }
+  .node-card.green:hover { box-shadow: 0 0 20px var(--green-bg); }
+
+  .node-card.red { border-left: 3px solid var(--red); }
+  .node-card.red .step-num { color: var(--red); }
+  .node-card.red:hover { box-shadow: 0 0 20px var(--red-bg); }
+
+  .node-card.gray { border-left: 3px solid var(--text-dim); }
+  .node-card.gray .step-num { color: var(--text-dim); }
+
+  /* Decision diamond */
+  .decision-wrapper {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .decision {
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-border);
+    border-radius: 12px;
+    padding: 16px 32px;
+    text-align: center;
+    position: relative;
+  }
+
+  .decision h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--amber);
+  }
+
+  .decision .desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Branch paths */
+  .branch-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: start;
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .branch-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  .branch-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: center;
+  }
+
+  .branch-card.end {
+    border-color: var(--gray-border);
+    background: var(--gray-bg);
+  }
+
+  .branch-card.end h4 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .branch-card.error {
+    border-color: var(--red-border);
+    background: var(--red-bg);
+  }
+
+  .branch-card.error h4 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--red);
+  }
+
+  .branch-card.success {
+    border-color: var(--green-border);
+    background: var(--green-bg);
+  }
+
+  .branch-card.success h4 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green);
+  }
+
+  /* Open question tag */
+  .oq-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: var(--coral);
+    background: var(--coral-bg);
+    border: 1px solid var(--coral-border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-top: 10px;
+  }
+
+  .oq-tag::before {
+    content: '?';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--coral);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 9px;
+  }
+
+  /* Field mapping table */
+  .field-table {
+    margin-top: 12px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .field-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .field-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .field-table td:first-child {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .field-table .unknown {
+    color: var(--coral);
+    font-style: italic;
+  }
+
+  .field-table code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: rgba(255,255,255,0.04);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* Section divider */
+  .section-divider {
+    max-width: 520px;
+    margin: 32px auto 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-divider .line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-divider .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  /* Open questions summary */
+  .oq-summary {
+    max-width: 880px;
+    margin: 56px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--coral-border);
+    border-radius: 14px;
+    padding: 28px 32px;
+  }
+
+  .oq-summary h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--coral);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .oq-summary h2::before {
+    content: '?';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--coral);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .oq-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .oq-list li {
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .oq-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--coral);
+  }
+
+  .oq-list li strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .oq-list li span {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .footer {
+    max-width: 880px;
+    margin: 48px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer span {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="eyebrow">Integration flow</div>
+  <h1>Unity Construct → <span>ProjectSight</span> project creation</h1>
+  <p>User journey for creating a ProjectSight project when a user creates a project in Trimble Unity Construct, triggered by a new "Create ProjectSight project" boolean toggle.</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>User action</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Integration step</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>Open question</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Field mapping</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Decision</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Success</div>
+</div>
+
+<div class="flow-container">
+  <div class="spine"></div>
+
+  <!-- STEP 1 -->
+  <div class="flow-node">
+    <div class="node-card gray">
+      <div class="step-num">Step 1</div>
+      <h3>User opens "Add Project" in Unity Construct</h3>
+      <div class="desc">The standard UC project creation form — Project Name, Admin, Status, Address, City, State, Zip, Country, Start/Target Date, Custom Fields.</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 2 -->
+  <div class="flow-node">
+    <div class="node-card blue">
+      <div class="step-num">Step 2</div>
+      <h3>User fills standard UC project fields</h3>
+      <div class="desc">Project Name*, e-Builder Project Administrator*, Project Status*, Description, Address, City, State, Zip, Country, Start Date, Target Date, Webcam URL.</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 3 - Toggle -->
+  <div class="flow-node">
+    <div class="node-card teal">
+      <div class="step-num">Step 3 — New field</div>
+      <h3>Toggle: "Create ProjectSight project"</h3>
+      <div class="desc">A new boolean toggle added to the UC Add Project form. When enabled, saving the UC project will also trigger ProjectSight project creation via API.</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- DECISION 1 -->
+  <div class="flow-node">
+    <div class="decision-wrapper">
+      <div class="decision">
+        <h3>Is the ProjectSight toggle ON?</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRANCH -->
+  <div class="flow-node">
+    <div class="branch-row">
+      <div>
+        <div class="branch-label">NO</div>
+        <div class="branch-card end">
+          <h4>Save UC project only</h4>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;color:var(--text-dim);font-size:12px;padding-top:24px">or</div>
+      <div>
+        <div class="branch-label">YES → continue</div>
+        <div class="branch-card success">
+          <h4>Proceed to PS creation</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 4 -->
+  <div class="flow-node">
+    <div class="node-card blue">
+      <div class="step-num">Step 4</div>
+      <h3>User clicks Save</h3>
+      <div class="desc">Triggers both the UC project save and the ProjectSight integration pipeline.</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 5 -->
+  <div class="flow-node">
+    <div class="node-card blue">
+      <div class="step-num">Step 5 — Backend</div>
+      <h3>Save UC project to database</h3>
+      <div class="desc">Standard UC project creation persists first, ensuring the UC record exists before any downstream integration.</div>
+    </div>
+  </div>
+
+  <div class="section-divider">
+    <div class="line"></div>
+    <div class="label">ProjectSight resolution</div>
+    <div class="line"></div>
+  </div>
+
+  <!-- STEP 6 - Account -->
+  <div class="flow-node">
+    <div class="node-card coral">
+      <div class="step-num">Step 6 — Open question</div>
+      <h3>Resolve ProjectSight account</h3>
+      <div class="desc">There is no ProjectSight API to create an account. We must use an existing account. Options: pre-configured default account per UC instance, or admin-configured mapping.</div>
+      <div class="oq-tag">Decision required — no create API exists</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 7 - Portfolio -->
+  <div class="flow-node">
+    <div class="node-card coral">
+      <div class="step-num">Step 7 — Open question</div>
+      <h3>Resolve ProjectSight portfolio</h3>
+      <div class="desc">Do we create a new portfolio per project, map all projects to a single default portfolio, or let admins configure a mapping? If creating new — what naming convention? UC project name? A prefix + name?</div>
+      <div class="oq-tag">Create new vs. map to existing</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 8 - Company -->
+  <div class="flow-node">
+    <div class="node-card coral">
+      <div class="step-num">Step 8 — Open question</div>
+      <h3>Resolve ProjectSight CompanyId</h3>
+      <div class="desc">ProjectSight requires a CompanyId. Is there a 1:1 mapping between UC organizations and PS companies? If not, this needs admin configuration or a new dropdown on the form when the PS toggle is enabled.</div>
+      <div class="oq-tag">Mapping strategy TBD</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 9 - WorkflowState -->
+  <div class="flow-node">
+    <div class="node-card coral">
+      <div class="step-num">Step 9 — Open question</div>
+      <h3>Create ProjectSight WorkflowState</h3>
+      <div class="desc">A WorkflowState is required for PS project creation. What default state do we create? "Active"? "Planning"? Does PS have standard states, or is it fully custom per account?</div>
+      <div class="oq-tag">Default state definition needed</div>
+    </div>
+  </div>
+
+  <div class="section-divider">
+    <div class="line"></div>
+    <div class="label">Field mapping &amp; API call</div>
+    <div class="line"></div>
+  </div>
+
+  <!-- STEP 10 - Field mapping -->
+  <div class="flow-node">
+    <div class="node-card purple">
+      <div class="step-num">Step 10</div>
+      <h3>Map fields: Unity Construct → ProjectSight</h3>
+      <div class="desc">Required PS fields: CompanyId, Name, Sequence, WorkflowState. Map from UC project data where possible.</div>
+      <table class="field-table">
+        <thead>
+          <tr><th>PS field</th><th>Source</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Name</code></td>
+            <td>UC Project Name</td>
+            <td>Direct map</td>
+          </tr>
+          <tr>
+            <td><code>CompanyId</code></td>
+            <td class="unknown">TBD — see step 8</td>
+            <td class="unknown">Open question</td>
+          </tr>
+          <tr>
+            <td><code>Sequence</code></td>
+            <td class="unknown">TBD — auto-increment? UC project number?</td>
+            <td class="unknown">Open question</td>
+          </tr>
+          <tr>
+            <td><code>WorkflowState</code></td>
+            <td class="unknown">TBD — see step 9</td>
+            <td class="unknown">Open question</td>
+          </tr>
+          <tr>
+            <td><code>Portfolio</code></td>
+            <td class="unknown">TBD — see step 7</td>
+            <td class="unknown">Open question</td>
+          </tr>
+          <tr>
+            <td><code>Prefix</code></td>
+            <td class="unknown">Optional — derive from UC?</td>
+            <td class="unknown">Open question</td>
+          </tr>
+          <tr>
+            <td><code>Suffix</code></td>
+            <td class="unknown">Optional — derive from UC?</td>
+            <td class="unknown">Open question</td>
+          </tr>
+          <tr>
+            <td><code>Number</code></td>
+            <td class="unknown">Optional — UC project number?</td>
+            <td class="unknown">Open question</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 11 - API Call -->
+  <div class="flow-node">
+    <div class="node-card teal">
+      <div class="step-num">Step 11 — Integration</div>
+      <h3>POST ProjectSight project via API</h3>
+      <div class="desc">Send the mapped payload to the ProjectSight API to create the project with CompanyId, Name, Sequence, and WorkflowState.</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- DECISION 2 -->
+  <div class="flow-node">
+    <div class="decision-wrapper">
+      <div class="decision">
+        <h3>API response — success?</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRANCH 2 -->
+  <div class="flow-node">
+    <div class="branch-row">
+      <div>
+        <div class="branch-label">FAIL</div>
+        <div class="branch-card error">
+          <h4>Surface error to user</h4>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;color:var(--text-dim);font-size:12px;padding-top:24px">or</div>
+      <div>
+        <div class="branch-label">SUCCESS → continue</div>
+        <div class="branch-card success">
+          <h4>PS project created</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- STEP 12 - Link -->
+  <div class="flow-node">
+    <div class="node-card teal">
+      <div class="step-num">Step 12 — Integration</div>
+      <h3>Link UC ↔ ProjectSight projects</h3>
+      <div class="desc">Store the returned PS projectId on the UC project record. This enables future cross-platform navigation and data sync.</div>
+    </div>
+  </div>
+
+  <div class="connector"><svg width="2" height="28"><line x1="1" y1="0" x2="1" y2="28" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="3 3"/></svg></div>
+
+  <!-- DONE -->
+  <div class="flow-node">
+    <div class="node-card green">
+      <div class="step-num">Complete</div>
+      <h3>Both projects created and linked</h3>
+      <div class="desc">UC project and ProjectSight project are now live and cross-referenced. User can navigate between them.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Open Questions Summary -->
+<div class="oq-summary">
+  <h2>Open questions to resolve</h2>
+  <ul class="oq-list">
+    <li>
+      <strong>Account resolution</strong>
+      <span>No PS API to create accounts. Must use existing. Pre-configured default per UC instance, or admin-selectable mapping?</span>
+    </li>
+    <li>
+      <strong>Portfolio strategy</strong>
+      <span>Create new portfolio per project (noisy), map to single default (simple), or admin-configured mapping? If new — naming convention?</span>
+    </li>
+    <li>
+      <strong>CompanyId mapping</strong>
+      <span>Is there a 1:1 between UC orgs and PS companies? If not, needs admin configuration or a conditional dropdown on the form.</span>
+    </li>
+    <li>
+      <strong>WorkflowState default</strong>
+      <span>What initial state for new PS projects? "Active"? "Planning"? Are PS workflow states standardized or fully custom per account?</span>
+    </li>
+    <li>
+      <strong>Sequence field</strong>
+      <span>PS requires Sequence (appears to be a project numbering scheme with optional prefix/suffix). Auto-generate counter within portfolio? Derive from UC project number?</span>
+    </li>
+    <li>
+      <strong>Additional field mappings</strong>
+      <span>Beyond Name, should Address/City/State/Zip carry over? Should "Link to Trimble Connect project" auto-toggle on PS side? What about Prefix, Suffix, Number?</span>
+    </li>
+    <li>
+      <strong>Error handling &amp; rollback</strong>
+      <span>If PS creation fails after UC save succeeds — retry? Surface error and let user retry manually? Rollback UC save? Queue for async retry?</span>
+    </li>
+  </ul>
+</div>
+
+<div class="footer">
+  <span>Trimble Unity Construct &times; ProjectSight Integration</span>
+  <span>Draft — April 2026</span>
+</div>
+
+</body>
+</html>
